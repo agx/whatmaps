@@ -20,10 +20,16 @@ import glob
 import os
 import logging
 import re
-import subprocess
 import string
+import subprocess
 import sys
 from optparse import OptionParser
+try:
+    import apt_pkg
+    import lsb_release
+except ImportError:
+    lsb_release = None
+    apt_pkg = None
 
 
 class PkgError(Exception):
@@ -84,11 +90,23 @@ class Distro(object):
         raise NotImplementedError
 
     @classmethod
+    def restart_service_cmd(klass, name):
+        raise NotImplementedError
+
+    @classmethod
+    def restart_service(klass, name):
+        raise NotImplementedError
+
+    @classmethod
     def pkg_services(klass, pkg):
         try:
             return klass._pkg_services[pkg.name]
         except KeyError, AttributeError:
             return []
+
+    @classmethod
+    def has_apt(klass):
+        return False
 
 
 class Pkg(object):
@@ -111,7 +129,6 @@ class Pkg(object):
         else:
             cmd = [ string.Template(arg).substitute(arg, pkg_name = self.name)
                     for arg in self._list_contents ]
-            logging.debug(cmd)
             list_contents = subprocess.Popen(cmd,
                                              stdout=subprocess.PIPE,
                                              stderr=subprocess.PIPE)
@@ -120,6 +137,10 @@ class Pkg(object):
             raise PkgError
         self.contents = output.split('\n')
         return self.contents
+
+    @property
+    def services(self):
+        raise NotImplementedError
 
 
 class DebianDistro(Distro):
@@ -130,6 +151,8 @@ class DebianDistro(Distro):
                       'apache2-mpm-prefork': [ 'apache2' ],
                       'dovecot-imapd':       [ 'dovecot' ],
                       'dovecot-pop3d':       [ 'dovecot' ],
+                      'exim4-daemon-light':  [ 'exim4' ],
+                      'exim4-daemon-heavy':  [ 'exim4' ],
                     }
 
     @classmethod
@@ -148,8 +171,89 @@ class DebianDistro(Distro):
         return DebianPkg(pkg)
 
     @classmethod
+    def restart_service_cmd(klass, name):
+        return ['invoke-rc.d', name, 'restart']
+
+    @classmethod
     def restart_service(klass, name):
-        subprocess.call(['invoke-rc.d', name, 'restart'])
+        subprocess.call(klass.restart_service_cmd(name))
+
+    @classmethod
+    def has_apt(klass):
+        return True
+
+    @staticmethod
+    def read_apt_pipeline():
+        whatmaps_enabled = False
+
+        version = sys.stdin.readline().rstrip()
+        if version != "VERSION 2":
+            logging.error("Wrong or missing VERSION from apt pipeline\n"
+              "(is Dpkg::Tools::Options::/usr/bin/whatmaps::Version set to 2?)")
+            raise PkgError
+
+        while 1:
+            aptconfig = sys.stdin.readline()
+            if not aptconfig or aptconfig == '\n':
+                break
+            if aptconfig.startswith('Whatmaps::Enable-Restart=') and \
+               aptconfig.strip().split('=', 1)[1].lower() in ["true", "1"]:
+                    logging.debug("Service restarts enabled")
+                    whatmaps_enabled = True
+
+        if not whatmaps_enabled:
+            return None
+
+        pkgs = {}
+        for line in sys.stdin.readlines():
+            if not line:
+                break
+            (pkgname, oldversion, compare, newversion, filename) = line.split()
+
+            if filename == '**CONFIGURE**':
+                if oldversion != '-': # Updates only
+                    pkgs[pkgname] = DebianPkg(pkgname)
+                    pkgs[pkgname].version = newversion
+        return pkgs
+
+
+    @classmethod
+    def _security_upgrade_origins(klass):
+        codename = lsb_release.get_distro_information()['CODENAME']
+        def _subst(line):
+            mapping = {'distro_codename' : codename,
+                       'distro_id' : klass.id, }
+            return string.Template(line).substitute(mapping)
+
+        origins = []
+        for s in apt_pkg.config.value_list('Whatmaps::Security-Update-Origins'):
+            (distro_id, distro_codename) = s.split()
+            origins.append((_subst(distro_id),
+                            _subst(distro_codename)))
+        return origins
+
+
+    @classmethod
+    def filter_security_updates(klass, pkgs):
+        """Filter on security updates"""
+
+        apt_pkg.init()
+        acquire = apt_pkg.Acquire()
+        cache = apt_pkg.Cache()
+
+        security_update_origins = klass._security_upgrade_origins()
+        security_updates = {}
+
+        for pkg in pkgs.values():
+            cache_pkg = cache[pkg.name]
+            for cache_version in cache_pkg.version_list:
+                if pkg.version == cache_version.ver_str:
+                    for pfile, _ in cache_version.file_list:
+                        for origin in security_update_origins:
+                            if pfile.origin == origin[0] and pfile.archive == origin[1]:
+                                security_updates[pkg] = pkg
+                                break
+        return security_updates
 
 
 class DebianPkg(Pkg):
@@ -210,10 +314,6 @@ class RedHatDistro(Distro):
         else:
             pkg = output.strip()
         return RpmPkg(pkg)
-
-    @classmethod
-    def restart_service(klass, name):
-        raise NotImplementedError
 
 
 class FedoraDistro(RedHatDistro):
@@ -279,18 +379,18 @@ def get_all_pids():
 
     return processes
 
+
 def detect_distro():
     id = None
 
-    try:
-        import lsb_release
+    if lsb_release:
         id = lsb_release.get_distro_information()['ID']
-    except ImportError:
-        lsb_release = subprocess.Popen(['lsb_release', '--id', '-s'],
-                                         stdout=subprocess.PIPE,
-                                         stderr=subprocess.PIPE)
-        output = lsb_release.communicate()[0]
-        if not lsb_release.returncode:
+    else:
+        lsb_cmd = subprocess.Popen(['lsb_release', '--id', '-s'],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+        output = lsb_cmd.communicate()[0]
+        if not lsb_cmd.returncode:
             id = output.strip()
 
     if id == DebianDistro.id:
@@ -308,8 +408,21 @@ def detect_distro():
             return None
 
 
+def write_cmd_file(services, cmd_file, distro):
+    "Write out commands needed to restart the services to a file"
+    out = file(cmd_file, 'w')
+    print >>out, '#! /bin/sh'
+    for service in services:
+        logging.debug("Need to restart %s", service)
+        print >>out, " ".join(distro.restart_service_cmd(service))
+    out.close()
+    os.chmod(cmd_file, 0755)
+
+
 def main(argv):
     shared_objects = []
+
+    distro = detect_distro()
 
     parser = OptionParser(usage='%prog [options] pkg1 [pkg2 pkg3 pkg4]')
     parser.add_option("--debug", action="store_true", dest="debug", default=False,
@@ -318,6 +431,11 @@ def main(argv):
                       help="enable verbose output")
     parser.add_option("--restart", action="store_true", dest="restart", default=False,
                       help="Restart services")
+    parser.add_option("--print-cmds", dest="print_cmds",
+                      help="Output restart commands to file instead of restarting")
+    parser.add_option("--apt", action="store_true", dest="apt", default=False,
+                      help="Use in apt pipeline")
+
     (options, args) = parser.parse_args(argv[1:])
 
     if options.debug:
@@ -337,11 +455,21 @@ def main(argv):
     else:
         logging.debug("Detected distribution: '%s'", distro.id)
 
-    if not args:
+    if args:
+        pkgs = [ distro.pkg(arg) for arg in args ]
+    elif options.apt and distro.has_apt:
+        try:
+            pkgs = distro.read_apt_pipeline()
+        except PkgError:
+            logging.error("Can't read apt pipeline")
+            return 1
+        if not pkgs:
+            return 0
+        pkgs = distro.filter_security_updates(pkgs)
+        logging.debug("Security Upgrades: %s" % pkgs)
+    else:
         parser.print_help()
         return 1
-    else:
-        pkgs = [ distro.pkg(arg) for arg in args ]
 
     # Find shared objects of updated packages
     for pkg in pkgs:
@@ -371,7 +499,7 @@ def main(argv):
                 pkg.procs = [ proc ]
                 pkgs[pkg.name] = pkg
 
-    logging.info("Packages and binaries:")
+    logging.info("Packages that ship the affected binaries:")
     map(lambda x: logging.info("  Pkg: %s, binaries: %s" % (x.name, x.procs)),
         pkgs.values())
 
@@ -395,9 +523,12 @@ def main(argv):
             return 0
 
     if options.restart:
-        for service in all_services:
-            logging.info("Restarting %s" % service)
-            distro.restart_service(service)
+        if options.print_cmds and all_services:
+            write_cmd_file(all_services, options.print_cmds, distro)
+        else:
+            for service in all_services:
+                logging.info("Restarting %s" % service)
+                distro.restart_service(service)
     elif all_services:
         print "Services that possibly need to be restarted:"
         for s in all_services:
