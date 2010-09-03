@@ -1,0 +1,273 @@
+#!/usr/bin/python -u
+# vim: set fileencoding=utf-8 :
+#
+# (C) 2010 Guido Guenther <agx@sigxcpu.org>
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import glob
+import os
+import logging
+import re
+import subprocess
+import sys
+from optparse import OptionParser
+import lsb_release
+
+
+class PkgError(Exception):
+    pass
+
+
+class Process(object):
+    """A process, needs /proc mounted"""
+
+    def __init__(self, pid):
+        self.pid = pid
+        self.mapped = []
+        try:
+            # Linux only so far
+            self.exe = os.readlink('/proc/%d/exe' % self.pid)
+            self.cmdline = open('/proc/%d/cmdline' % self.pid).read()
+        except OSError:
+            self.exe = None
+            self.cmdline = None
+
+    def _read_maps(self):
+        for line in file('/proc/%d/maps' % self.pid):
+            try:
+                so = line.split()[5].strip()
+                self.mapped.append(so)
+            except IndexError:
+                pass
+
+    def maps(self, path):
+        """check if process maps the object at path"""
+        if not self.mapped:
+            self._read_maps()
+
+        if path in self.mapped:
+            return True
+        else:
+            return False
+
+    def __repr__(self):
+        return "<Process object pid:%d>" % self.pid
+
+
+class Distro(object):
+    @classmethod
+    def pkg(klass, path):
+        raise NotImplementedError
+
+    @classmethod
+    def pkg_by_file(klass, path):
+        raise NotImplementedError
+
+
+class Pkg(object):
+    services = None
+    shared_objects = None
+
+    def __init__(self):
+        raise NotImplementedError
+
+
+class DebianDistro(Distro):
+    "Debian (dpkg) based distribution"""
+    @classmethod
+    def pkg(klass, name):
+        return DebianPkg(name)
+
+    @classmethod
+    def pkg_by_file(klass, path):
+        find_file = subprocess.Popen(["dpkg-query -S %s 2>/dev/null" % path],
+                                      stdout=subprocess.PIPE, shell=True)
+        output = find_file.communicate()[0]
+        if find_file.returncode:
+            return None
+        pkg = output.split(':')[0]
+        return DebianPkg(pkg)
+
+    @classmethod
+    def restart_service(klass, name):
+        subprocess.call('invoke-rc.d %s restart' % name, shell = True)
+
+
+class DebianPkg(Pkg):
+    def __init__(self, name):
+        self.name = name
+        self._services = None
+        self._shared_objects = None
+
+    def _get_shared_objects(self):
+        if self._shared_objects != None:
+            return self._shared_objects
+
+        self._shared_objects = []
+        regex = re.compile(r'(?P<so>/.*\.so(\.[^/])*$)')
+        list_contents = subprocess.Popen(["dpkg-query -L %s 2>/dev/null" % self.name],
+                                          stdout=subprocess.PIPE, shell=True)
+        output = list_contents.communicate()[0]
+        if list_contents.returncode:
+            raise PkgError
+
+        for line in output.split('\n'):
+            m = regex.match(line)
+            if m:
+                self._shared_objects.append(m.group('so'))
+        return self._shared_objects
+
+    def _get_services(self):
+        if self._services != None:
+            return self._services
+
+        self._services = []
+        # Only supports sysvinit so far:
+        script_re = re.compile('/etc/init.d/[a-zA-Z0-9]')
+        list_contents = subprocess.Popen(["dpkg-query -L %s 2>/dev/null" % self.name],
+                                          stdout=subprocess.PIPE, shell=True)
+        output = list_contents.communicate()[0]
+        if list_contents.returncode:
+            raise PkgError
+
+        for line in output.split('\n'):
+            if script_re.match(line):
+                self._services.append(os.path.basename(line.strip()))
+        return self._services
+
+    def __repr__(self):
+        return "<Debian Pkg object name:'%s'>" % self.name
+
+    services = property(_get_services, None)
+    shared_objects = property(_get_shared_objects, None)
+
+
+def check_maps(procs, shared_objects):
+    restart_procs = {}
+    for proc in procs:
+        for so in shared_objects:
+            if proc.maps(so):
+                if restart_procs.has_key(proc.exe):
+                    restart_procs[proc.exe] += [ proc ]
+                else:
+                    restart_procs[proc.exe] = [ proc ]
+                continue
+    return restart_procs
+
+
+def get_all_pids():
+    processes = []
+    paths = glob.glob('/proc/[0-9]*')
+
+    for path in paths:
+        p = Process(int(path.rsplit('/')[-1]))
+        processes.append(p)
+
+    return processes
+
+def detect_distro():
+    distro_id = lsb_release.get_distro_information()['ID']
+
+    if distro_id == 'Debian':
+        logging.debug("Detected Debian distribution")
+        return DebianDistro
+    else:
+        return None
+
+
+def main(argv):
+    shared_objects = []
+
+    parser = OptionParser(usage='%prog [options] pkg1 [pkg2 pkg3 pkg4]')
+    parser.add_option("--verbose", action="store_true", dest="verbose", default=False,
+                      help="verbose command execution")
+    parser.add_option("--restart", action="store_true", dest="restart", default=False,
+                      help="Restart services")
+    (options, args) = parser.parse_args(argv[1:])
+
+    if options.verbose:
+        level = logging.DEBUG
+    else:
+        level = logging.WARNING
+
+    logging.basicConfig(level=level,
+                        format='%(levelname)s: %(message)s')
+
+    distro = detect_distro()
+    if not distro:
+        logging.error("Unsupported Distribution")
+        return 1
+
+    if not args:
+        parser.print_help()
+        return 1
+    else:
+        pkgs = [ distro.pkg(arg) for arg in args ]
+
+    # Find shared objects of newly installed packages
+    for pkg in pkgs:
+        try:
+            shared_objects += pkg.shared_objects
+        except PkgError:
+            logging.error("Cannot parse contents of %s" % pkg.name)
+            return 1
+    logging.debug("Shared objects: %s", shared_objects)
+    logging.debug("")
+
+    # Find processes that map them
+    restart_procs = check_maps(get_all_pids(), shared_objects)
+    logging.debug("Processes that map them: %s", restart_procs)
+    logging.debug("")
+
+    # Find packages that contain the binaries of these processes
+    pkgs = {}
+    for proc in restart_procs:
+        pkg = distro.pkg_by_file(proc)
+        if not pkg:
+            logging.warning("No package found for '%s' - restart manually" % proc)
+        else:
+            if pkgs.has_key(pkg.name):
+                pkgs[pkg.name].procs.append(proc)
+            else:
+                pkg.procs = [ proc ]
+                pkgs[pkg.name] = pkg
+
+    for pkg in pkgs.values():
+        logging.debug("%s: %s", pkg.name, pkg.procs)
+
+    all_services = set()
+    for pkg in pkgs.values():
+        services = set(pkg.services)
+        if not services:
+            logging.warning("No service script found in '%s' for '%s' - restart manually" 
+                            % (pkg.name, pkg.procs))
+        else:
+            all_services = all_services.union(services)
+
+    if options.restart:
+        for service in all_services:
+            logging.info("Restarting %s" % service)
+            distro.restart_service(service)
+    else:
+        print "Services that possibly need to be restarted:"
+        for s in all_services:
+            print s
+
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))
+
+# vim:et:ts=4:sw=4:et:sts=4:ai:set list listchars=tab\:»·,trail\:·:
