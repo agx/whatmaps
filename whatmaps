@@ -23,7 +23,6 @@ import re
 import subprocess
 import sys
 from optparse import OptionParser
-import lsb_release
 
 
 class PkgError(Exception):
@@ -79,16 +78,34 @@ class Distro(object):
 class Pkg(object):
     services = None
     shared_objects = None
+    _so_regex = re.compile(r'(?P<so>/.*\.so(\.[^/])*$)')
 
-    def __init__(self):
-        raise NotImplementedError
+    def __init__(self, name):
+        self.name = name
+        self._services = None
+        self._shared_objects = None
+        self._contents = None
 
     def __repr__(self):
         return "<%s Pkg object name:'%s'>" % (self.type, self.name)
 
+    def _get_contents(self):
+        if self._contents:
+            return self._contents
+        else:
+            list_contents = subprocess.Popen([self._list_contents % self.name],
+                                             stdout=subprocess.PIPE, shell=True)
+        output = list_contents.communicate()[0]
+        if list_contents.returncode:
+            raise PkgError
+        self.contents = output.split('\n')
+        return self.contents
+
 
 class DebianDistro(Distro):
     "Debian (dpkg) based distribution"""
+    id = 'Debian'
+
     @classmethod
     def pkg(klass, name):
         return DebianPkg(name)
@@ -110,26 +127,11 @@ class DebianDistro(Distro):
 
 class DebianPkg(Pkg):
     type = 'Debian'
-    _so_regex = re.compile(r'(?P<so>/.*\.so(\.[^/])*$)')
     _init_script_re = re.compile('/etc/init.d/[a-zA-Z0-9]')
+    _list_contents = "dpkg-query -L %s 2>/dev/null"
 
     def __init__(self, name):
-        self.name = name
-        self._services = None
-        self._shared_objects = None
-        self._contents = None
-
-    def _get_contents(self):
-        if self._contents:
-            return self._contents
-        else:
-            list_contents = subprocess.Popen(["dpkg-query -L %s 2>/dev/null" % self.name],
-                                             stdout=subprocess.PIPE, shell=True)
-        output = list_contents.communicate()[0]
-        if list_contents.returncode:
-            raise PkgError
-        self.contents = output.split('\n')
-        return self.contents
+         Pkg.__init__(self, name)
 
     @property
     def shared_objects(self):
@@ -159,6 +161,60 @@ class DebianPkg(Pkg):
         return self._services
 
 
+class RedHatDistro(Distro):
+    # Package contains file: rpm -q -f somefile
+    "RPM based distribution"""
+
+    @classmethod
+    def pkg(klass, name):
+        return RpmPkg(name)
+
+    @classmethod
+    def pkg_by_file(klass, path):
+        find_file = subprocess.Popen(["rpm -qf %s 2>/dev/null" % path],
+                                      stdout=subprocess.PIPE, shell=True)
+        output = find_file.communicate()[0]
+        if find_file.returncode:
+            return None
+        pkg = output.strip()
+        return RpmPkg(pkg)
+
+    @classmethod
+    def restart_service(klass, name):
+        raise NotImplementedError
+
+
+class FedoraDistro(RedHatDistro):
+    id = 'Fedora'
+    pass
+
+
+class RpmPkg(Pkg):
+    type = 'RPM'
+    _list_contents = "rpm -ql %s 2>/dev/null"
+
+    def __init__(self, name):
+        Pkg.__init__(self, name)
+
+    @property
+    def shared_objects(self):
+        if self._shared_objects != None:
+            return self._shared_objects
+
+        self._shared_objects = []
+        contents = self._get_contents()
+
+        for line in contents:
+            m = self._so_regex.match(line)
+            if m:
+                self._shared_objects.append(m.group('so'))
+        return self._shared_objects
+
+    @property
+    def services(self):
+        raise NotImplementedError
+
+
 def check_maps(procs, shared_objects):
     restart_procs = {}
     for proc in procs:
@@ -183,11 +239,22 @@ def get_all_pids():
     return processes
 
 def detect_distro():
-    distro_id = lsb_release.get_distro_information()['ID']
+    id = None
 
-    if distro_id == 'Debian':
-        logging.debug("Detected Debian distribution")
+    try:
+        import lsb_release
+        id = lsb_release.get_distro_information()['ID']
+    except ImportError:
+        lsb_release = subprocess.Popen(["lsb_release --id -s 2>/dev/null"],
+                                         stdout=subprocess.PIPE, shell=True)
+        output = lsb_release.communicate()[0]
+        if not lsb_release.returncode:
+            id = output.strip()
+
+    if id == DebianDistro.id:
         return DebianDistro
+    elif id == FedoraDistro.id:
+        return FedoraDistro
     else:
         return None
 
@@ -198,12 +265,16 @@ def main(argv):
     parser = OptionParser(usage='%prog [options] pkg1 [pkg2 pkg3 pkg4]')
     parser.add_option("--debug", action="store_true", dest="debug", default=False,
                       help="enable debug output")
+    parser.add_option("--verbose", action="store_true", dest="verbose", default=False,
+                      help="enable verbose output")
     parser.add_option("--restart", action="store_true", dest="restart", default=False,
                       help="Restart services")
     (options, args) = parser.parse_args(argv[1:])
 
     if options.debug:
         level = logging.DEBUG
+    elif options.verbose:
+        level = logging.INFO
     else:
         level = logging.WARNING
 
@@ -214,6 +285,8 @@ def main(argv):
     if not distro:
         logging.error("Unsupported Distribution")
         return 1
+    else:
+        logging.debug("Detected distribution: '%s'", distro.id)
 
     if not args:
         parser.print_help()
@@ -249,24 +322,31 @@ def main(argv):
                 pkg.procs = [ proc ]
                 pkgs[pkg.name] = pkg
 
-    logging.debug("Packages and binaries:")
-    map(lambda x: logging.debug("  Pkg: %s, binaries: %s" % (x.name, x.procs)),
+    logging.info("Packages and binaries:")
+    map(lambda x: logging.info("  Pkg: %s, binaries: %s" % (x.name, x.procs)),
         pkgs.values())
 
     all_services = set()
-    for pkg in pkgs.values():
-        services = set(pkg.services)
-        if not services:
-            logging.warning("No service script found in '%s' for '%s' - restart manually" 
-                            % (pkg.name, pkg.procs))
+    try:
+        for pkg in pkgs.values():
+            services = set(pkg.services)
+            if not services:
+                logging.warning("No service script found in '%s' for '%s' - restart manually"
+                                % (pkg.name, pkg.procs))
+            else:
+                all_services = all_services.union(services)
+    except NotImplementedError:
+        if level > logging.INFO:
+            logging.error("Service listing/restarting not implemented for distribution %s - rerun with --verbose to see a list of binaries and packages to map a shared objects from %s", distro.id, args)
+            return 1
         else:
-            all_services = all_services.union(services)
+            return 0
 
     if options.restart:
         for service in all_services:
             logging.info("Restarting %s" % service)
             distro.restart_service(service)
-    else:
+    elif all_services:
         print "Services that possibly need to be restarted:"
         for s in all_services:
             print s
