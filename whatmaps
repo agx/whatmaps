@@ -31,6 +31,7 @@ class PkgError(Exception):
 
 class Process(object):
     """A process, needs /proc mounted"""
+    deleted_re = re.compile(r"(?P<exe>.*) \(deleted\)$")
 
     def __init__(self, pid):
         self.pid = pid
@@ -38,6 +39,13 @@ class Process(object):
         try:
             # Linux only so far
             self.exe = os.readlink('/proc/%d/exe' % self.pid)
+            if not os.path.exists(self.exe):
+                    m = self.deleted_re.match(self.exe)
+                    if m:
+                        self.exe = m.group('exe')
+                        logging.debug("Using deleted exe %s", self.exe)
+                    else:
+                        logging.debug("%s doesn't exist", self.exe)
             self.cmdline = open('/proc/%d/cmdline' % self.pid).read()
         except OSError:
             self.exe = None
