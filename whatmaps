@@ -199,11 +199,11 @@ class RedHatDistro(Distro):
 
 class FedoraDistro(RedHatDistro):
     id = 'Fedora'
-    pass
 
 
 class RpmPkg(Pkg):
     type = 'RPM'
+    _init_script_re = re.compile('/etc/rc.d/init.d/[a-zA-Z0-9]')
     _list_contents = "rpm -ql %s 2>/dev/null"
 
     def __init__(self, name):
@@ -223,9 +223,19 @@ class RpmPkg(Pkg):
                 self._shared_objects.append(m.group('so'))
         return self._shared_objects
 
+
     @property
     def services(self):
-        raise NotImplementedError
+        if self._services != None:
+            return self._services
+
+        self._services = []
+        contents = self._get_contents()
+        # Only supports sysvinit so far:
+        for line in contents:
+            if self._init_script_re.match(line):
+                self._services.append(os.path.basename(line.strip()))
+        return self._services
 
 
 def check_maps(procs, shared_objects):
