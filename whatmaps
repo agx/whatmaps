@@ -172,6 +172,7 @@ class DebianPkg(Pkg):
 class RedHatDistro(Distro):
     # Package contains file: rpm -q -f somefile
     "RPM based distribution"""
+    _pkg_re = re.compile(r'(?P<pkg>[\w\-\+]+)-(?P<ver>[\w\.]+)-(?P<rel>[\w\.]+)\.(?P<arch>.+)')
 
     @classmethod
     def pkg(klass, name):
@@ -184,7 +185,11 @@ class RedHatDistro(Distro):
         output = find_file.communicate()[0]
         if find_file.returncode:
             return None
-        pkg = output.strip()
+        m = klass._pkg_re.match(output.strip())
+        if m:
+            pkg = m.group('pkg')
+        else:
+            pkg = output.strip()
         return RpmPkg(pkg)
 
     @classmethod
