@@ -256,7 +256,14 @@ def detect_distro():
     elif id == FedoraDistro.id:
         return FedoraDistro
     else:
-        return None
+        if os.path.exists('/usr/bin/dpkg'):
+            logging.warning("Unknown distro but dpkg found, assuming Debian")
+            return DebianDistro
+        elif os.path.exists('/bin/rpm'):
+            logging.warning("Unknown distro but rpm found, assuming Fedora")
+            return FedoraDistro
+        else:
+            return None
 
 
 def main(argv):
