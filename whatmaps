@@ -135,7 +135,7 @@ class DebianDistro(Distro):
 
 class DebianPkg(Pkg):
     type = 'Debian'
-    _init_script_re = re.compile('/etc/init.d/[a-zA-Z0-9]')
+    _init_script_re = re.compile('/etc/init.d/[\w\-\.]')
     _list_contents = "dpkg-query -L %s 2>/dev/null"
 
     def __init__(self, name):
@@ -203,7 +203,7 @@ class FedoraDistro(RedHatDistro):
 
 class RpmPkg(Pkg):
     type = 'RPM'
-    _init_script_re = re.compile('/etc/rc.d/init.d/[a-zA-Z0-9]')
+    _init_script_re = re.compile('/etc/init.d/[\w\-\.]')
     _list_contents = "rpm -ql %s 2>/dev/null"
 
     def __init__(self, name):
