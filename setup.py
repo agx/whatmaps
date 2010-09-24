@@ -3,18 +3,11 @@
 
 from distutils.core import setup
 
-data_files = []
-
-try:
-    import lsb_release
-    if lsb_release.get_distro_information()['ID'] in [ 'Debian' ]:
-       data_files = [('../etc/apt/apt.conf.d/',
-                      ['apt/50whatmaps_apt']),
-                     ('../etc/apt/apt.conf.d/',
-                      ['apt/20services']),
-                    ]
-except ImportError:
-    pass
+data_files = [('../etc/apt/apt.conf.d/',
+              ['apt/50whatmaps_apt']),
+             ('../etc/apt/apt.conf.d/',
+              ['apt/20services']),
+            ]
 
 setup(name = "whatmaps",
       author = 'Guido Günther',

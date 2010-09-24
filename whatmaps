@@ -243,18 +243,10 @@ class DebianDistro(Distro):
 
     @classmethod
     def _security_update_origins(klass):
-        "Determine security update origins from apt configuration"
-        codename = lsb_release.get_distro_information()['CODENAME']
-        def _subst(line):
-            mapping = {'distro_codename' : codename,
-                       'distro_id' : klass.id, }
-            return string.Template(line).substitute(mapping)
-
         origins = []
-        for s in apt_pkg.config.value_list('Whatmaps::Security-Update-Origins'):
+        for s in apt_pkg.Config.ValueList('Whatmaps::Security-Update-Origins'):
             (distro_id, distro_codename) = s.split()
-            origins.append((_subst(distro_id),
-                            _subst(distro_codename)))
+            origins.append((distro_id, distro_codename))
         logging.debug("Security Update Origins: %s", origins)
         return origins
 
@@ -264,20 +256,20 @@ class DebianDistro(Distro):
         """Filter on security updates"""
 
         apt_pkg.init()
-        acquire = apt_pkg.Acquire()
-        cache = apt_pkg.Cache()
+        acquire = apt_pkg.GetAcquire()
+        cache = apt_pkg.GetCache()
 
         security_update_origins = klass._security_update_origins()
         security_updates = {}
 
         for pkg in pkgs.values():
             cache_pkg = cache[pkg.name]
-            for cache_version in cache_pkg.version_list:
-                if pkg.version == cache_version.ver_str:
-                    for pfile, _ in cache_version.file_list:
+            for cache_version in cache_pkg.VersionList:
+                if pkg.version == cache_version.VerStr:
+                    for pfile, _ in cache_version.FileList:
                         for origin in security_update_origins:
-                            if pfile.origin == origin[0] and \
-                               pfile.archive == origin[1]:
+                            if pfile.Origin == origin[0] and \
+                               pfile.Archive == origin[1]:
                                 security_updates[pkg] = pkg
                                 break
         return security_updates

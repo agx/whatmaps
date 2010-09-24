@@ -3,6 +3,6 @@ Whatmaps::Enable-Restart "0";
 
 // What updates are considered security updates
 Whatmaps::Security-Update-Origins {
-   "${distro_id} stable";
-   "${distro_id} ${distro_codename}-security";
+   "Debian stable";
+   "Debian stable-security";
 };
