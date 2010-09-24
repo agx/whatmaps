@@ -82,6 +82,13 @@ class Distro(object):
     def pkg_by_file(klass, path):
         raise NotImplementedError
 
+    @classmethod
+    def pkg_services(klass, pkg):
+        try:
+            return klass._pkg_services[pkg.name]
+        except KeyError, AttributeError:
+            return []
+
 
 class Pkg(object):
     services = None
@@ -113,6 +120,12 @@ class Pkg(object):
 class DebianDistro(Distro):
     "Debian (dpkg) based distribution"""
     id = 'Debian'
+
+    _pkg_services = { 'apache2-mpm-worker':  [ 'apache2' ],
+                      'apache2-mpm-prefork': [ 'apache2' ],
+                      'dovecot-imapd':       [ 'dovecot' ],
+                      'dovecot-pop3d':       [ 'dovecot' ],
+                    }
 
     @classmethod
     def pkg(klass, name):
@@ -170,7 +183,6 @@ class DebianPkg(Pkg):
 
 
 class RedHatDistro(Distro):
-    # Package contains file: rpm -q -f somefile
     "RPM based distribution"""
     _pkg_re = re.compile(r'(?P<pkg>[\w\-\+]+)-(?P<ver>[\w\.]+)-(?P<rel>[\w\.]+)\.(?P<arch>.+)')
 
@@ -222,7 +234,6 @@ class RpmPkg(Pkg):
             if m:
                 self._shared_objects.append(m.group('so'))
         return self._shared_objects
-
 
     @property
     def services(self):
@@ -359,15 +370,18 @@ def main(argv):
     all_services = set()
     try:
         for pkg in pkgs.values():
-            services = set(pkg.services)
+            services = pkg.services + distro.pkg_services(pkg)
             if not services:
-                logging.warning("No service script found in '%s' for '%s' - restart manually"
-                                % (pkg.name, pkg.procs))
+                logging.warning("No service script found in '%s' for '%s' "
+                                "- restart manually" % (pkg.name, pkg.procs))
             else:
                 all_services = all_services.union(services)
     except NotImplementedError:
         if level > logging.INFO:
-            logging.error("Service listing/restarting not implemented for distribution %s - rerun with --verbose to see a list of binaries and packages to map a shared objects from %s", distro.id, args)
+            logging.error("Getting Service listing not implemented "
+            "for distribution %s - rerun with --verbose to see a list"
+            "of binaries and packages to map a shared objects from %s",
+            distro.id, args)
             return 1
         else:
             return 0
