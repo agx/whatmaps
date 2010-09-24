@@ -21,6 +21,7 @@ import os
 import logging
 import re
 import subprocess
+import string
 import sys
 from optparse import OptionParser
 
@@ -108,8 +109,12 @@ class Pkg(object):
         if self._contents:
             return self._contents
         else:
-            list_contents = subprocess.Popen([self._list_contents % self.name],
-                                             stdout=subprocess.PIPE, shell=True)
+            cmd = [ string.Template(arg).substitute(arg, pkg_name = self.name)
+                    for arg in self._list_contents ]
+            logging.debug(cmd)
+            list_contents = subprocess.Popen(cmd,
+                                             stdout=subprocess.PIPE,
+                                             stderr=subprocess.PIPE)
         output = list_contents.communicate()[0]
         if list_contents.returncode:
             raise PkgError
@@ -133,8 +138,9 @@ class DebianDistro(Distro):
 
     @classmethod
     def pkg_by_file(klass, path):
-        find_file = subprocess.Popen(["dpkg-query -S %s 2>/dev/null" % path],
-                                      stdout=subprocess.PIPE, shell=True)
+        find_file = subprocess.Popen(['dpkg-query', '-S', path],
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE)
         output = find_file.communicate()[0]
         if find_file.returncode:
             return None
@@ -143,13 +149,13 @@ class DebianDistro(Distro):
 
     @classmethod
     def restart_service(klass, name):
-        subprocess.call('invoke-rc.d %s restart' % name, shell = True)
+        subprocess.call(['invoke-rc.d', name, 'restart'])
 
 
 class DebianPkg(Pkg):
     type = 'Debian'
     _init_script_re = re.compile('/etc/init.d/[\w\-\.]')
-    _list_contents = "dpkg-query -L %s 2>/dev/null"
+    _list_contents = ['dpkg-query', '-L', '${pkg_name}' ]
 
     def __init__(self, name):
          Pkg.__init__(self, name)
@@ -192,8 +198,9 @@ class RedHatDistro(Distro):
 
     @classmethod
     def pkg_by_file(klass, path):
-        find_file = subprocess.Popen(["rpm -qf %s 2>/dev/null" % path],
-                                      stdout=subprocess.PIPE, shell=True)
+        find_file = subprocess.Popen(['rpm', '-qf', path],
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE)
         output = find_file.communicate()[0]
         if find_file.returncode:
             return None
@@ -216,7 +223,7 @@ class FedoraDistro(RedHatDistro):
 class RpmPkg(Pkg):
     type = 'RPM'
     _init_script_re = re.compile('/etc/init.d/[\w\-\.]')
-    _list_contents = "rpm -ql %s 2>/dev/null"
+    _list_contents = [ 'rpm', '-ql', '$pkg_name' ]
 
     def __init__(self, name):
         Pkg.__init__(self, name)
@@ -279,8 +286,9 @@ def detect_distro():
         import lsb_release
         id = lsb_release.get_distro_information()['ID']
     except ImportError:
-        lsb_release = subprocess.Popen(["lsb_release --id -s 2>/dev/null"],
-                                         stdout=subprocess.PIPE, shell=True)
+        lsb_release = subprocess.Popen(['lsb_release', '--id', '-s'],
+                                         stdout=subprocess.PIPE,
+                                         stderr=subprocess.PIPE)
         output = lsb_release.communicate()[0]
         if not lsb_release.returncode:
             id = output.strip()
