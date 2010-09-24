@@ -250,7 +250,8 @@ class DebianDistro(Distro):
                 if pkg.version == cache_version.ver_str:
                     for pfile, _ in cache_version.file_list:
                         for origin in security_update_origins:
-                            if pfile.origin == origin[0] and pfile.archive == origin[1]:
+                            if pfile.origin == origin[0] and \
+                               pfile.archive == origin[1]:
                                 security_updates[pkg] = pkg
                                 break
         return security_updates
@@ -294,7 +295,8 @@ class DebianPkg(Pkg):
 
 class RedHatDistro(Distro):
     "RPM based distribution"""
-    _pkg_re = re.compile(r'(?P<pkg>[\w\-\+]+)-(?P<ver>[\w\.]+)-(?P<rel>[\w\.]+)\.(?P<arch>.+)')
+    _pkg_re = re.compile(r'(?P<pkg>[\w\-\+]+)-(?P<ver>[\w\.]+)'
+                          '-(?P<rel>[\w\.]+)\.(?P<arch>.+)')
 
     @classmethod
     def pkg(klass, name):
@@ -425,12 +427,12 @@ def main(argv):
     distro = detect_distro()
 
     parser = OptionParser(usage='%prog [options] pkg1 [pkg2 pkg3 pkg4]')
-    parser.add_option("--debug", action="store_true", dest="debug", default=False,
-                      help="enable debug output")
-    parser.add_option("--verbose", action="store_true", dest="verbose", default=False,
-                      help="enable verbose output")
-    parser.add_option("--restart", action="store_true", dest="restart", default=False,
-                      help="Restart services")
+    parser.add_option("--debug", action="store_true", dest="debug",
+                      default=False, help="enable debug output")
+    parser.add_option("--verbose", action="store_true", dest="verbose",
+                      default=False, help="enable verbose output")
+    parser.add_option("--restart", action="store_true", dest="restart",
+                      default=False, help="Restart services")
     parser.add_option("--print-cmds", dest="print_cmds",
                       help="Output restart commands to file instead of restarting")
     parser.add_option("--apt", action="store_true", dest="apt", default=False,
@@ -484,7 +486,8 @@ def main(argv):
     # Find processes that map them
     restart_procs = check_maps(get_all_pids(), shared_objects)
     logging.debug("Processes that map them:")
-    map(lambda (x, y):  logging.debug("  Exe: %s Pids: %s", x, y), restart_procs.items())
+    map(lambda (x, y):  logging.debug("  Exe: %s Pids: %s", x, y),
+                                      restart_procs.items())
 
     # Find packages that contain the binaries of these processes
     pkgs = {}
