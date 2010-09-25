@@ -489,7 +489,7 @@ def main(argv):
 
     if args:
         pkgs = [ distro.pkg(arg) for arg in args ]
-    elif options.apt and distro.has_apt:
+    elif options.apt and distro.has_apt():
         try:
             pkgs = distro.read_apt_pipeline()
         except PkgError:
