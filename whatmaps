@@ -26,10 +26,12 @@ import sys
 from optparse import OptionParser
 try:
     import apt_pkg
+except ImportError:
+    apt_pkg = None
+try:
     import lsb_release
 except ImportError:
     lsb_release = None
-    apt_pkg = None
 
 
 class PkgError(Exception):
@@ -37,28 +39,28 @@ class PkgError(Exception):
 
 
 class Process(object):
-    """A process, needs /proc mounted"""
+    """A process - Linux only so far, needs /proc mounted"""
     deleted_re = re.compile(r"(?P<exe>.*) \(deleted\)$")
 
     def __init__(self, pid):
         self.pid = pid
         self.mapped = []
         try:
-            # Linux only so far
             self.exe = os.readlink('/proc/%d/exe' % self.pid)
             if not os.path.exists(self.exe):
-                    m = self.deleted_re.match(self.exe)
-                    if m:
-                        self.exe = m.group('exe')
-                        logging.debug("Using deleted exe %s", self.exe)
-                    else:
-                        logging.debug("%s doesn't exist", self.exe)
+                m = self.deleted_re.match(self.exe)
+                if m:
+                    self.exe = m.group('exe')
+                    logging.debug("Using deleted exe %s", self.exe)
+                else:
+                    logging.debug("%s doesn't exist", self.exe)
             self.cmdline = open('/proc/%d/cmdline' % self.pid).read()
         except OSError:
             self.exe = None
             self.cmdline = None
 
     def _read_maps(self):
+        """Read the SOs from /proc/<pid>/maps"""
         for line in file('/proc/%d/maps' % self.pid):
             try:
                 so = line.split()[5].strip()
@@ -67,7 +69,7 @@ class Process(object):
                 pass
 
     def maps(self, path):
-        """check if process maps the object at path"""
+        """Check if the process maps the object at path"""
         if not self.mapped:
             self._read_maps()
 
@@ -81,38 +83,67 @@ class Process(object):
 
 
 class Distro(object):
+    """
+    A distribution
+    @cvar id: distro id as returned by lsb-release
+    """
+    id = None
+
     @classmethod
-    def pkg(klass, path):
+    def pkg(klass, name):
+        """Return package object named name"""
         raise NotImplementedError
 
     @classmethod
     def pkg_by_file(klass, path):
+        """Return package object that contains path"""
         raise NotImplementedError
 
     @classmethod
-    def restart_service_cmd(klass, name):
+    def restart_service_cmd(klass, service):
+        """Command to restart service"""
         raise NotImplementedError
 
     @classmethod
-    def restart_service(klass, name):
+    def restart_service(klass, service):
+        """Restart a service"""
         raise NotImplementedError
 
     @classmethod
     def pkg_services(klass, pkg):
+        """
+        List of services that package pkg needs restarted that aren't part
+        of pkg itself
+        """
         try:
             return klass._pkg_services[pkg.name]
-        except KeyError, AttributeError:
+        except (KeyError, AttributeError):
             return []
 
     @classmethod
     def has_apt(klass):
+        """Does the distribution use apt"""
         return False
 
 
 class Pkg(object):
+    """
+    A package in a distribution
+    @var services:  list of services provided by package
+    @var shared_objects: list of shared objects shipped in this package
+    @cvar type: package type (e.g. RPM or Debian)
+    @cvar _so_regex: regex that matches shared objects in the list returned by
+                     _get_contents
+    @cvar _list_contents: command to list contents of a package, will be passed
+                     to subprocess. "$pkg_name" will be replaced by the package
+                     name.
+    """
+
+    type = None
     services = None
     shared_objects = None
     _so_regex = re.compile(r'(?P<so>/.*\.so(\.[^/])*$)')
+    _list_contents = None
 
     def __init__(self, name):
         self.name = name
@@ -124,6 +155,7 @@ class Pkg(object):
         return "<%s Pkg object name:'%s'>" % (self.type, self.name)
 
     def _get_contents(self):
+        """List of files n the package"""
         if self._contents:
             return self._contents
         else:
@@ -137,10 +169,6 @@ class Pkg(object):
             raise PkgError
         self.contents = output.split('\n')
         return self.contents
-
-    @property
-    def services(self):
-        raise NotImplementedError
 
 
 class DebianDistro(Distro):
@@ -218,7 +246,8 @@ class DebianDistro(Distro):
 
 
     @classmethod
-    def _security_upgrade_origins(klass):
+    def _security_update_origins(klass):
+        "Determine security update origins from apt configuration"
         codename = lsb_release.get_distro_information()['CODENAME']
         def _subst(line):
             mapping = {'distro_codename' : codename,
@@ -230,6 +259,7 @@ class DebianDistro(Distro):
             (distro_id, distro_codename) = s.split()
             origins.append((_subst(distro_id),
                             _subst(distro_codename)))
+        logging.debug("Security Update Origins: %s", origins)
         return origins
 
 
@@ -241,7 +271,7 @@ class DebianDistro(Distro):
         acquire = apt_pkg.Acquire()
         cache = apt_pkg.Cache()
 
-        security_update_origins = klass._security_upgrade_origins()
+        security_update_origins = klass._security_update_origins()
         security_updates = {}
 
         for pkg in pkgs.values():
@@ -263,7 +293,7 @@ class DebianPkg(Pkg):
     _list_contents = ['dpkg-query', '-L', '${pkg_name}' ]
 
     def __init__(self, name):
-         Pkg.__init__(self, name)
+        Pkg.__init__(self, name)
 
     @property
     def shared_objects(self):
