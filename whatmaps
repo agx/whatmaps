@@ -107,7 +107,7 @@ class Distro(object):
     @classmethod
     def restart_service(klass, service):
         """Restart a service"""
-        raise NotImplementedError
+        subprocess.call(klass.restart_service_cmd(service))
 
     @classmethod
     def pkg_services(klass, pkg):
@@ -201,10 +201,6 @@ class DebianDistro(Distro):
     @classmethod
     def restart_service_cmd(klass, name):
         return ['invoke-rc.d', name, 'restart']
-
-    @classmethod
-    def restart_service(klass, name):
-        subprocess.call(klass.restart_service_cmd(name))
 
     @classmethod
     def has_apt(klass):
@@ -346,6 +342,10 @@ class RedHatDistro(Distro):
         else:
             pkg = output.strip()
         return RpmPkg(pkg)
+
+    @classmethod
+    def restart_service_cmd(klass, name):
+        return ['service', name, 'restart']
 
 
 class FedoraDistro(RedHatDistro):
