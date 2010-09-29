@@ -544,7 +544,7 @@ def main(argv):
                 logging.warning("No service script found in '%s' for '%s' "
                                 "- restart manually" % (pkg.name, pkg.procs))
             else:
-                all_services = all_services.union(services)
+                all_services.update(services)
     except NotImplementedError:
         if level > logging.INFO:
             logging.error("Getting Service listing not implemented "
