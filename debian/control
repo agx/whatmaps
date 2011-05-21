@@ -2,7 +2,7 @@ Source: whatmaps
 Section: admin
 Priority: extra
 Maintainer: Guido Günther <agx@sigxcpu.org>
-Build-Depends: debhelper (>= 7.0.50~), python-support
+Build-Depends: debhelper (>= 7.0.50~), python-support, lsb-release
 Standards-Version: 3.9.1
 Homepage: https://honk.sigxcpu.org/piki/projects/whatmaps
 Vcs-Git: git://honk.sigxcpu.org/git/whatmaps.git/
