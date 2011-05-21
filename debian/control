@@ -16,4 +16,4 @@ Description: Find processes mapping shared objects
  make use of that updated library (e.g. if the library got a security upgrade).
  .
  Whatmaps looks for shared objects in packages and finds running programs that
- map them, list them and allows to restart them.
+ map them, list them and allows one to restart them.
