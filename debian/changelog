@@ -1,8 +1,12 @@
 whatmaps (0.0.2) unstable; urgency=low
 
   * New upstream version:
-      * [f736294] Fix regex. The current one only matched one letter/number SO
-        names.
+      * Fix regex. The current one only matched one letter/number SO names.
+  * [082b2ec] Build-depend on lsb-release so the apt configuration gets
+    included
+  * [a732594] Bump standards version
+  * [9bbccc9] Adapt so Squeeze's apache 2.2 package
+  * [47709f0] Fix grammar in description
 
  -- Guido Günther <agx@sigxcpu.org>  Sat, 21 May 2011 13:30:06 +0200
 
