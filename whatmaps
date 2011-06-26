@@ -47,13 +47,12 @@ class Process(object):
         self.mapped = []
         try:
             self.exe = os.readlink('/proc/%d/exe' % self.pid)
+            m = self.deleted_re.match(self.exe)
+            if m:
+                self.exe = m.group('exe')
+                logging.debug("Using deleted exe %s", self.exe)
             if not os.path.exists(self.exe):
-                m = self.deleted_re.match(self.exe)
-                if m:
-                    self.exe = m.group('exe')
-                    logging.debug("Using deleted exe %s", self.exe)
-                else:
-                    logging.debug("%s doesn't exist", self.exe)
+                logging.debug("%s doesn't exist", self.exe)
             self.cmdline = open('/proc/%d/cmdline' % self.pid).read()
         except OSError:
             self.exe = None
