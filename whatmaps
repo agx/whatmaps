@@ -23,6 +23,7 @@ import re
 import string
 import subprocess
 import sys
+import errno
 from optparse import OptionParser
 try:
     import apt_pkg
@@ -60,7 +61,13 @@ class Process(object):
 
     def _read_maps(self):
         """Read the SOs from /proc/<pid>/maps"""
-        for line in file('/proc/%d/maps' % self.pid):
+        try:
+            f = file('/proc/%d/maps' % self.pid)
+        except IOError as e:
+            # ignore killed process
+            if e.errno != errno.ENOENT:
+                raise
+        for line in f:
             try:
                 so = line.split()[5].strip()
                 self.mapped.append(so)
