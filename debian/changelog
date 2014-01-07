@@ -1,3 +1,15 @@
+whatmaps (0.0.3~bpo70+1) wheezy-backports; urgency=medium
+
+  * [18158e1] Adapt so Squeeze's apache 2.2 package
+  * [3fe7094] Check for deleted binaries before trying to stat them
+  * [0fa3c86] Skip already terminated processes. Thanks to Christop Göhre for
+    pointing this out
+  * [97de504] Remove duplicate detect_distro call
+  * [c1eef79] Don't fail if lsb_release is missing
+  * [d6b284e] Remove template from copyright
+
+ -- Guido Günther <agx@sigxcpu.org>  Tue, 07 Jan 2014 19:23:41 +0100
+
 whatmaps (0.0.2) unstable; urgency=low
 
   * New upstream version:
