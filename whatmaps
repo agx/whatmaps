@@ -161,11 +161,11 @@ class Pkg(object):
         return "<%s Pkg object name:'%s'>" % (self.type, self.name)
 
     def _get_contents(self):
-        """List of files n the package"""
+        """List of files in the package"""
         if self._contents:
             return self._contents
         else:
-            cmd = [ string.Template(arg).substitute(arg, pkg_name = self.name)
+            cmd = [ string.Template(arg).substitute(arg, pkg_name=self.name)
                     for arg in self._list_contents ]
             list_contents = subprocess.Popen(cmd,
                                              stdout=subprocess.PIPE,
