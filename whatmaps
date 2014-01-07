@@ -425,12 +425,16 @@ def detect_distro():
     if lsb_release:
         id = lsb_release.get_distro_information()['ID']
     else:
-        lsb_cmd = subprocess.Popen(['lsb_release', '--id', '-s'],
+        try:
+            lsb_cmd = subprocess.Popen(['lsb_release', '--id', '-s'],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
-        output = lsb_cmd.communicate()[0]
-        if not lsb_cmd.returncode:
-            id = output.strip()
+            output = lsb_cmd.communicate()[0]
+            if not lsb_cmd.returncode:
+               id = output.strip()
+        except OSError:
+            # id is None in this case
+            pass
 
     if id == DebianDistro.id:
         return DebianDistro
