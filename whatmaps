@@ -67,6 +67,7 @@ class Process(object):
             # ignore killed process
             if e.errno != errno.ENOENT:
                 raise
+            return
         for line in f:
             try:
                 so = line.split()[5].strip()
