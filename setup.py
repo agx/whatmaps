@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # vim: set fileencoding=utf-8 :
 
-from distutils.core import setup
+from setuptools import setup
 
 data_files = []
 

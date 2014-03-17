@@ -1,7 +1,7 @@
 #!/usr/bin/python -u
 # vim: set fileencoding=utf-8 :
 #
-# (C) 2010 Guido Guenther <agx@sigxcpu.org>
+# (C) 2010,2014 Guido Günther <agx@sigxcpu.org>
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
 #   the Free Software Foundation, either version 3 of the License, or
@@ -67,6 +67,7 @@ class Process(object):
             # ignore killed process
             if e.errno != errno.ENOENT:
                 raise
+            return
         for line in f:
             try:
                 so = line.split()[5].strip()
@@ -94,6 +95,9 @@ class Distro(object):
     @cvar id: distro id as returned by lsb-release
     """
     id = None
+    service_blacklist = set()
+    _pkg_services = {}
+    _pkg_blacklist = {}
 
     @classmethod
     def pkg(klass, name):
@@ -123,7 +127,18 @@ class Distro(object):
         """
         try:
             return klass._pkg_services[pkg.name]
-        except (KeyError, AttributeError):
+        except KeyError:
+            return []
+
+    @classmethod
+    def pkg_service_blacklist(klass, pkg):
+        """
+        List of services in pkg that we don't want to be restarted even when
+        a binary from this package maps a shared lib that changed.
+        """
+        try:
+            return klass._pkg_service_blacklist[pkg.name]
+        except KeyError:
             return []
 
     @classmethod
@@ -161,11 +176,11 @@ class Pkg(object):
         return "<%s Pkg object name:'%s'>" % (self.type, self.name)
 
     def _get_contents(self):
-        """List of files n the package"""
+        """List of files in the package"""
         if self._contents:
             return self._contents
         else:
-            cmd = [ string.Template(arg).substitute(arg, pkg_name = self.name)
+            cmd = [ string.Template(arg).substitute(arg, pkg_name=self.name)
                     for arg in self._list_contents ]
             list_contents = subprocess.Popen(cmd,
                                              stdout=subprocess.PIPE,
@@ -188,7 +203,14 @@ class DebianDistro(Distro):
                       'dovecot-pop3d':       [ 'dovecot' ],
                       'exim4-daemon-light':  [ 'exim4' ],
                       'exim4-daemon-heavy':  [ 'exim4' ],
+                      'qemu-system-x86_64':  [ 'libvirt-guests' ],
                     }
+
+    # Per package blacklist
+    _pkg_service_blacklist = { 'libvirt-bin': [ 'libvirt-guests' ] }
+
+    # Per distro blacklist
+    service_blacklist = set(['kvm', 'qemu-kvm', 'qemu-system-x86'])
 
     @classmethod
     def pkg(klass, name):
@@ -548,12 +570,14 @@ def main(argv):
     all_services = set()
     try:
         for pkg in pkgs.values():
-            services = pkg.services + distro.pkg_services(pkg)
+            services = set(pkg.services + distro.pkg_services(pkg))
+            services -= set(distro.pkg_service_blacklist(pkg))
             if not services:
                 logging.warning("No service script found in '%s' for '%s' "
                                 "- restart manually" % (pkg.name, pkg.procs))
             else:
                 all_services.update(services)
+        all_services -= distro.service_blacklist
     except NotImplementedError:
         if level > logging.INFO:
             logging.error("Getting Service listing not implemented "
