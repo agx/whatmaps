@@ -127,7 +127,7 @@ class Distro(object):
         """
         try:
             return klass._pkg_services[pkg.name]
-        except (KeyError, AttributeError):
+        except KeyError:
             return []
 
     @classmethod
