@@ -34,59 +34,11 @@ try:
 except ImportError:
     lsb_release = None
 
+from whatmaps.process import Process
+
 
 class PkgError(Exception):
     pass
-
-
-class Process(object):
-    """A process - Linux only so far, needs /proc mounted"""
-    deleted_re = re.compile(r"(?P<exe>.*) \(deleted\)$")
-
-    def __init__(self, pid):
-        self.pid = pid
-        self.mapped = []
-        try:
-            self.exe = os.readlink('/proc/%d/exe' % self.pid)
-            m = self.deleted_re.match(self.exe)
-            if m:
-                self.exe = m.group('exe')
-                logging.debug("Using deleted exe %s", self.exe)
-            if not os.path.exists(self.exe):
-                logging.debug("%s doesn't exist", self.exe)
-            self.cmdline = open('/proc/%d/cmdline' % self.pid).read()
-        except OSError:
-            self.exe = None
-            self.cmdline = None
-
-    def _read_maps(self):
-        """Read the SOs from /proc/<pid>/maps"""
-        try:
-            f = file('/proc/%d/maps' % self.pid)
-        except IOError as e:
-            # ignore killed process
-            if e.errno != errno.ENOENT:
-                raise
-            return
-        for line in f:
-            try:
-                so = line.split()[5].strip()
-                self.mapped.append(so)
-            except IndexError:
-                pass
-
-    def maps(self, path):
-        """Check if the process maps the object at path"""
-        if not self.mapped:
-            self._read_maps()
-
-        if path in self.mapped:
-            return True
-        else:
-            return False
-
-    def __repr__(self):
-        return "<Process object pid:%d>" % self.pid
 
 
 class Distro(object):
@@ -601,6 +553,9 @@ def main(argv):
             print s
 
     return 0
+
+def run():
+    return(main(sys.argv))
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv))

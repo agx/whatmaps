@@ -1,0 +1,6 @@
+.coverage
+*.pyc
+*~
+build/
+cover/
+whatmaps.egg-info/

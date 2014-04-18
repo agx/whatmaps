@@ -1,0 +1,37 @@
+After a security update of a library one needs to restart all programs that
+make use of this library in order for the security update to become effective.
+whatmaps takes a package name and looks (on Linux systems) in /proc/pid/maps
+for processes that map shared objects contained in a certain package. It then
+looks for the corresponding processes to find the services that need to be
+restarted.
+
+It currently supports Debian and Fedora but might also work well on other
+Debian or RPM based distributions.
+
+Usage
+=====
+Pass the names of the packages that had shared objects updated:
+
+    whatmaps <pkg1> <pkg2>
+
+The example output looks like:
+
+    # whatmaps libssl0.9.8
+    WARNING: No service script found in 'wpasupplicant' for '['/sbin/wpa_supplicant']' - restart manually
+    Services that possibly need to be restarted:
+    postfix
+    libvirt-bin
+    ntpd
+
+Apt Integration
+===============
+
+To enable automatic restarts during security updates on Debian based systems set:
+
+    Whatmaps::Enable-Restart "1";
+
+in /etc/apt/apt.conf.d/20services.
+
+See
+
+https://honk.sigxcpu.org/piki/projects/whatmaps/

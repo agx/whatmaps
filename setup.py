@@ -20,7 +20,10 @@ setup(name = "whatmaps",
       author = 'Guido Günther',
       author_email = 'agx@sigxcpu.org',
       data_files = data_files,
-      scripts = [ 'whatmaps' ],
+      packages = ['whatmaps'],
+      entry_points = {
+          'console_scripts': [ 'whatmaps = whatmaps.command:run' ],
+      },
 )
 
 # vim:et:ts=4:sw=4:et:sts=4:ai:set list listchars=tab\:»·,trail\:·:
