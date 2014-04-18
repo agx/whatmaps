@@ -1,3 +1,15 @@
+whatmaps (0.0.5) unstable; urgency=medium
+
+  * [8d0efd3] Improve description
+  * [ce27981] Add README.Debian that explains howto enable apt integration
+  * [1f9bde4] ship README
+  * [e415fe7] Ship manpage
+  * [b3e2fef] Bump standards version to 3.9.5
+  * [38be6c5] Run tests during build
+  * New version 0.0.5 (Closes: #745133)
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 18 Apr 2014 15:16:38 +0200
+
 whatmaps (0.0.3~bpo70+1) wheezy-backports; urgency=medium
 
   * [18158e1] Adapt so Squeeze's apache 2.2 package
