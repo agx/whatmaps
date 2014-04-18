@@ -37,55 +37,7 @@ except ImportError:
 
 from . process import Process
 from . distro import Distro
-
-
-class PkgError(Exception):
-    pass
-
-
-class Pkg(object):
-    """
-    A package in a distribution
-    @var services:  list of services provided by package
-    @var shared_objects: list of shared objects shipped in this package
-    @cvar type: package type (e.g. RPM or Debian)
-    @cvar _so_regex: regex that matches shared objects in the list returned by
-                     _get_contents
-    @cvar _list_contents: command to list contents of a package, will be passed
-                     to subprocess. "$pkg_name" will be replaced by the package
-                     name.
-    """
-
-    type = None
-    services = None
-    shared_objects = None
-    _so_regex = re.compile(r'(?P<so>/.*\.so(\.[^/]*)$)')
-    _list_contents = None
-
-    def __init__(self, name):
-        self.name = name
-        self._services = None
-        self._shared_objects = None
-        self._contents = None
-
-    def __repr__(self):
-        return "<%s Pkg object name:'%s'>" % (self.type, self.name)
-
-    def _get_contents(self):
-        """List of files in the package"""
-        if self._contents:
-            return self._contents
-        else:
-            cmd = [ string.Template(arg).substitute(arg, pkg_name=self.name)
-                    for arg in self._list_contents ]
-            list_contents = subprocess.Popen(cmd,
-                                             stdout=subprocess.PIPE,
-                                             stderr=subprocess.PIPE)
-        output = list_contents.communicate()[0]
-        if list_contents.returncode:
-            raise PkgError
-        self.contents = output.split('\n')
-        return self.contents
+from . pkg import Pkg, PkgError
 
 
 class DebianDistro(Distro):
