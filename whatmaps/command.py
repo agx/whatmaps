@@ -34,69 +34,13 @@ try:
 except ImportError:
     lsb_release = None
 
-from whatmaps.process import Process
+
+from . process import Process
+from . distro import Distro
 
 
 class PkgError(Exception):
     pass
-
-
-class Distro(object):
-    """
-    A distribution
-    @cvar id: distro id as returned by lsb-release
-    """
-    id = None
-    service_blacklist = set()
-    _pkg_services = {}
-    _pkg_blacklist = {}
-
-    @classmethod
-    def pkg(klass, name):
-        """Return package object named name"""
-        raise NotImplementedError
-
-    @classmethod
-    def pkg_by_file(klass, path):
-        """Return package object that contains path"""
-        raise NotImplementedError
-
-    @classmethod
-    def restart_service_cmd(klass, service):
-        """Command to restart service"""
-        raise NotImplementedError
-
-    @classmethod
-    def restart_service(klass, service):
-        """Restart a service"""
-        subprocess.call(klass.restart_service_cmd(service))
-
-    @classmethod
-    def pkg_services(klass, pkg):
-        """
-        List of services that package pkg needs restarted that aren't part
-        of pkg itself
-        """
-        try:
-            return klass._pkg_services[pkg.name]
-        except KeyError:
-            return []
-
-    @classmethod
-    def pkg_service_blacklist(klass, pkg):
-        """
-        List of services in pkg that we don't want to be restarted even when
-        a binary from this package maps a shared lib that changed.
-        """
-        try:
-            return klass._pkg_service_blacklist[pkg.name]
-        except KeyError:
-            return []
-
-    @classmethod
-    def has_apt(klass):
-        """Does the distribution use apt"""
-        return False
 
 
 class Pkg(object):
