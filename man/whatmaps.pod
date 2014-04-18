@@ -1,0 +1,43 @@
+=head1 NAME
+
+whatmaps - Find and restart services after library upgrades
+
+=head1 SYNOPSIS
+=encoding utf8
+
+B<whatmaps> [--restart] [--print-cmds=I<FILE>] pkg1 [pkg2 pkg3 ...]
+
+=head1 DESCRIPTION
+
+B<whatmaps> tries to find a list of services that need to be restarted
+after a library upgrade because they map that particular library into
+their address space. It does this by extracting a list of shared
+objects from the packages given on the command line. It then looks at
+the list of running processes to find those that map the shared
+objects and uses the distributions package manager to find out the
+packages that ship them. It then prints a list of services in these
+packages that likely need to be restarted.
+
+By default it assumes all services in the found packages need a restart but it
+also keeps a internal distribution specific list of exceptions.
+
+If the I<--restart> option is given, the services are restarted without any
+prompting and with the I<--prind-cmds> option the restart commands are written to
+a file for later execution.
+
+On Debian systems B<whatmaps> can also be run automatically by apt-get. See
+L</usr/share/doc/whatmaps/README.Debian> for details.
+
+=head1 SEE ALSO
+
+apt(8)
+
+The latest version is available at
+L<https://honk.sigxcpu.org/piki/projects/whatmaps/>.
+
+=head1 AUTHOR
+
+Guido Günther <agx@sigxcpu.org>
+
+=cut
+
