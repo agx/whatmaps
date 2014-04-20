@@ -30,47 +30,10 @@ try:
 except ImportError:
     lsb_release = None
 
-
 from . process import Process
 from . distro import Distro
 from . pkg import Pkg, PkgError
-
-
-class DebianPkg(Pkg):
-    type = 'Debian'
-    _init_script_re = re.compile('/etc/init.d/[\w\-\.]')
-    _list_contents = ['dpkg-query', '-L', '${pkg_name}' ]
-
-    def __init__(self, name):
-        Pkg.__init__(self, name)
-
-    @property
-    def shared_objects(self):
-        if self._shared_objects != None:
-            return self._shared_objects
-
-        self._shared_objects = []
-        contents = self._get_contents()
-
-        for line in contents:
-            m = self._so_regex.match(line)
-            if m:
-                self._shared_objects.append(m.group('so'))
-        return self._shared_objects
-
-    @property
-    def services(self):
-        if self._services != None:
-            return self._services
-
-        self._services = []
-        contents = self._get_contents()
-        # Only supports sysvinit so far:
-        for line in contents:
-            if self._init_script_re.match(line):
-                self._services.append(os.path.basename(line.strip()))
-        return self._services
-
+from . debianpkg import DebianPkg
 
 class RedHatDistro(Distro):
     "RPM based distribution"""
@@ -112,20 +75,6 @@ class RpmPkg(Pkg):
 
     def __init__(self, name):
         Pkg.__init__(self, name)
-
-    @property
-    def shared_objects(self):
-        if self._shared_objects != None:
-            return self._shared_objects
-
-        self._shared_objects = []
-        contents = self._get_contents()
-
-        for line in contents:
-            m = self._so_regex.match(line)
-            if m:
-                self._shared_objects.append(m.group('so'))
-        return self._shared_objects
 
     @property
     def services(self):
