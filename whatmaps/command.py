@@ -32,9 +32,11 @@ except ImportError:
 
 from . process import Process
 from . debiandistro import DebianDistro
+from . redhatdistro  import FedoraDistro
 from . pkg import Pkg, PkgError
 from . debianpkg import DebianPkg
 from . rpmpkg import RpmPkg
+
 
 def check_maps(procs, shared_objects):
     restart_procs = {}
