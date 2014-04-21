@@ -22,19 +22,12 @@ import errno
 import glob
 import os
 import logging
-import subprocess
 import sys
 from optparse import OptionParser
-try:
-    import lsb_release
-except ImportError:
-    lsb_release = None
 
 from . process import Process
-from . debiandistro import DebianDistro
-from . redhatdistro  import FedoraDistro
+from . distro import Distro
 from . pkg import PkgError
-
 
 def check_maps(procs, shared_objects):
     restart_procs = {}
@@ -58,38 +51,6 @@ def get_all_pids():
         processes.append(p)
 
     return processes
-
-
-def detect_distro():
-    id = None
-
-    if lsb_release:
-        id = lsb_release.get_distro_information()['ID']
-    else:
-        try:
-            lsb_cmd = subprocess.Popen(['lsb_release', '--id', '-s'],
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
-            output = lsb_cmd.communicate()[0]
-            if not lsb_cmd.returncode:
-               id = output.strip()
-        except OSError:
-            # id is None in this case
-            pass
-
-    if id == DebianDistro.id:
-        return DebianDistro
-    elif id == FedoraDistro.id:
-        return FedoraDistro
-    else:
-        if os.path.exists('/usr/bin/dpkg'):
-            logging.warning("Unknown distro but dpkg found, assuming Debian")
-            return DebianDistro
-        elif os.path.exists('/bin/rpm'):
-            logging.warning("Unknown distro but rpm found, assuming Fedora")
-            return FedoraDistro
-        else:
-            return None
 
 
 def write_cmd_file(services, cmd_file, distro):
@@ -130,7 +91,7 @@ def main(argv):
     logging.basicConfig(level=level,
                         format='%(levelname)s: %(message)s')
 
-    distro = detect_distro()
+    distro = Distro.detect()
     if not distro:
         logging.error("Unsupported Distribution")
         return 1

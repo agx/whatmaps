@@ -31,11 +31,11 @@ import subprocess
 import sys
 import string
 
-from . distro import Distro
+import distro
 from . debianpkg import DebianPkg
 from . pkg import PkgError
 
-class DebianDistro(Distro):
+class DebianDistro(distro.Distro):
     "Debian (dpkg) based distribution"
     id = 'Debian'
 

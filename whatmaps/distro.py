@@ -15,7 +15,15 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import logging
+import os
 import subprocess
+
+
+try:
+    import lsb_release
+except ImportError:
+    lsb_release = None
 
 class Distro(object):
     """
@@ -74,3 +82,45 @@ class Distro(object):
     def has_apt(klass):
         """Does the distribution use apt"""
         return False
+
+    @staticmethod
+    def detect():
+        return detect()
+
+import debiandistro
+import redhatdistro
+
+def detect():
+    """
+    Detect the distribution we run on. Returns C{None} if the
+    distribution is unknown.
+    """
+    id = None
+
+    if lsb_release:
+        id = lsb_release.get_distro_information()['ID']
+    else:
+        try:
+            lsb_cmd = subprocess.Popen(['lsb_release', '--id', '-s'],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+            output = lsb_cmd.communicate()[0]
+            if not lsb_cmd.returncode:
+               id = output.strip()
+        except OSError:
+            # id is None in this case
+            pass
+
+    if id == debiandistro.DebianDistro.id:
+        return debiandistro.DebianDistro
+    elif id == redhatdistro.FedoraDistro.id:
+        return redhatdistro.FedoraDistro
+    else:
+        if os.path.exists('/usr/bin/dpkg'):
+            logging.warning("Unknown distro but dpkg found, assuming Debian")
+            return debiandistro.DebianDistro
+        elif os.path.exists('/bin/rpm'):
+            logging.warning("Unknown distro but rpm found, assuming Fedora")
+            return debiandistro.FedoraDistro
+        else:
+            return None

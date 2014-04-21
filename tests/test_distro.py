@@ -16,9 +16,9 @@
 
 import unittest
 
-from whatmaps.distro import Distro
+from mock import patch
 
-from . import context
+from whatmaps.distro import Distro, detect
 
 class Pkg(object):
     name = 'doesnotmatter'
@@ -38,3 +38,11 @@ class TestDistro(unittest.TestCase):
         self.assertEqual(Distro.pkg_services(Pkg), [])
         self.assertEqual(Distro.pkg_service_blacklist(Pkg), [])
         self.assertFalse(Distro.has_apt())
+
+    def test_detect_via_lsb_release_module(self):
+        "Detect distro via lsb_release"
+        with patch('lsb_release.get_distro_information', return_value={'ID': 'Debian'}):
+            # Make sure we don't use the fallback
+            with patch('os.path.exists', return_value=False):
+                d = detect()
+                self.assertEqual(d.id, 'Debian')
