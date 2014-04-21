@@ -31,43 +31,10 @@ except ImportError:
     lsb_release = None
 
 from . process import Process
-from . distro import Distro
+from . debiandistro import DebianDistro
 from . pkg import Pkg, PkgError
 from . debianpkg import DebianPkg
 from . rpmpkg import RpmPkg
-
-class RedHatDistro(Distro):
-    "RPM based distribution"""
-    _pkg_re = re.compile(r'(?P<pkg>[\w\-\+]+)-(?P<ver>[\w\.]+)'
-                          '-(?P<rel>[\w\.]+)\.(?P<arch>.+)')
-
-    @classmethod
-    def pkg(klass, name):
-        return RpmPkg(name)
-
-    @classmethod
-    def pkg_by_file(klass, path):
-        find_file = subprocess.Popen(['rpm', '-qf', path],
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.PIPE)
-        output = find_file.communicate()[0]
-        if find_file.returncode:
-            return None
-        m = klass._pkg_re.match(output.strip())
-        if m:
-            pkg = m.group('pkg')
-        else:
-            pkg = output.strip()
-        return RpmPkg(pkg)
-
-    @classmethod
-    def restart_service_cmd(klass, name):
-        return ['service', name, 'restart']
-
-
-class FedoraDistro(RedHatDistro):
-    id = 'Fedora'
-
 
 def check_maps(procs, shared_objects):
     restart_procs = {}
