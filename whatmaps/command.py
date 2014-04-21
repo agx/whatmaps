@@ -34,6 +34,7 @@ from . process import Process
 from . distro import Distro
 from . pkg import Pkg, PkgError
 from . debianpkg import DebianPkg
+from . rpmpkg import RpmPkg
 
 class RedHatDistro(Distro):
     "RPM based distribution"""
@@ -66,28 +67,6 @@ class RedHatDistro(Distro):
 
 class FedoraDistro(RedHatDistro):
     id = 'Fedora'
-
-
-class RpmPkg(Pkg):
-    type = 'RPM'
-    _init_script_re = re.compile('/etc/rc.d/init.d/[\w\-\.]')
-    _list_contents = [ 'rpm', '-ql', '$pkg_name' ]
-
-    def __init__(self, name):
-        Pkg.__init__(self, name)
-
-    @property
-    def services(self):
-        if self._services != None:
-            return self._services
-
-        self._services = []
-        contents = self._get_contents()
-        # Only supports sysvinit so far:
-        for line in contents:
-            if self._init_script_re.match(line):
-                self._services.append(os.path.basename(line.strip()))
-        return self._services
 
 
 def check_maps(procs, shared_objects):
