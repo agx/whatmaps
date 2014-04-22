@@ -43,7 +43,7 @@ def check_maps(procs, shared_objects):
     for proc in procs:
         for so in shared_objects:
             if proc.maps(so):
-                if restart_procs.has_key(proc.exe):
+                if proc.exe in restart_procs:
                     restart_procs[proc.exe] += [ proc ]
                 else:
                     restart_procs[proc.exe] = [ proc ]
@@ -178,7 +178,7 @@ def main(argv):
         if not pkg:
             logging.warning("No package found for '%s' - restart manually" % proc)
         else:
-            if pkgs.has_key(pkg.name):
+            if pkg.name in pkgs:
                 pkgs[pkg.name].procs.append(proc)
             else:
                 pkg.procs = [ proc ]

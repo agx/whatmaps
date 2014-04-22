@@ -85,7 +85,7 @@ class TestDebianDistro(unittest.TestCase):
         with patch('sys.stdin', new_callable=AptPipelineMock):
             pkgs = DebianDistro.read_apt_pipeline()
             self.assertEqual(len(pkgs), 1)
-            self.assertTrue(pkgs.has_key('pkg1'))
+            self.assertIn('pkg1', pkgs)
             self.assertTrue(pkgs['pkg1'].name, 'pkg1')
 
     @patch('apt_pkg.init')
