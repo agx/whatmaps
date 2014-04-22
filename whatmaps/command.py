@@ -16,6 +16,8 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from __future__ import print_function
+
 import glob
 import os
 import logging
@@ -97,10 +99,10 @@ def detect_distro():
 def write_cmd_file(services, cmd_file, distro):
     "Write out commands needed to restart the services to a file"
     out = open(cmd_file, 'w')
-    print >>out, '#! /bin/sh'
+    print('#! /bin/sh', file=out)
     for service in services:
         logging.debug("Need to restart %s", service)
-        print >>out, " ".join(distro.restart_service_cmd(service))
+        print(" ".join(distro.restart_service_cmd(service)), file=out)
     out.close()
     os.chmod(cmd_file, 0755)
 
@@ -218,9 +220,9 @@ def main(argv):
                 logging.info("Restarting %s" % service)
                 distro.restart_service(service)
     elif all_services:
-        print "Services that possibly need to be restarted:"
+        print("Services that possibly need to be restarted:")
         for s in all_services:
-            print s
+            print(s)
 
     return 0
 
