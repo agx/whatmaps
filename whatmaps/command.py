@@ -163,13 +163,14 @@ def main(argv):
             logging.error("Cannot parse contents of %s" % pkg.name)
             return 1
     logging.debug("Found shared objects:")
-    map(lambda x: logging.debug("  %s", x), shared_objects)
+    for so in shared_objects:
+        logging.debug("  %s", so)
 
     # Find processes that map them
     restart_procs = check_maps(get_all_pids(), shared_objects)
     logging.debug("Processes that map them:")
-    map(lambda (x, y):  logging.debug("  Exe: %s Pids: %s", x, y),
-                                      restart_procs.items())
+    for exe, pids in restart_procs.items():
+        logging.debug("  Exe: %s Pids: %s", exe, pids),
 
     # Find packages that contain the binaries of these processes
     pkgs = {}
@@ -185,8 +186,8 @@ def main(argv):
                 pkgs[pkg.name] = pkg
 
     logging.info("Packages that ship the affected binaries:")
-    map(lambda x: logging.info("  Pkg: %s, binaries: %s" % (x.name, x.procs)),
-        pkgs.values())
+    for pkg in pkgs.values():
+        logging.info("  Pkg: %s, binaries: %s" % (pkg.name, pkg.procs))
 
     all_services = set()
     try:
