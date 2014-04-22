@@ -53,7 +53,7 @@ class Process(object):
     def _read_maps(self):
         """Read the SOs from /proc/<pid>/maps"""
         try:
-            f = file(self._procpath('%d/maps' % self.pid))
+            f = open(self._procpath('%d/maps' % self.pid))
         except IOError as e:
             # ignore killed process
             if e.errno != errno.ENOENT:

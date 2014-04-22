@@ -96,7 +96,7 @@ def detect_distro():
 
 def write_cmd_file(services, cmd_file, distro):
     "Write out commands needed to restart the services to a file"
-    out = file(cmd_file, 'w')
+    out = open(cmd_file, 'w')
     print >>out, '#! /bin/sh'
     for service in services:
         logging.debug("Need to restart %s", service)
