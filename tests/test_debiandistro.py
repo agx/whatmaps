@@ -80,7 +80,7 @@ class TestDebianDistro(unittest.TestCase):
                         '']
 
             def readline(self):
-                return self.iter.next()
+                return next(self.iter)
 
         with patch('sys.stdin', new_callable=AptPipelineMock):
             pkgs = DebianDistro.read_apt_pipeline()
