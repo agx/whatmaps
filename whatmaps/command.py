@@ -104,7 +104,7 @@ def write_cmd_file(services, cmd_file, distro):
         logging.debug("Need to restart %s", service)
         print(" ".join(distro.restart_service_cmd(service)), file=out)
     out.close()
-    os.chmod(cmd_file, 0755)
+    os.chmod(cmd_file, 0o755)
 
 
 def main(argv):
