@@ -63,14 +63,18 @@ class TestPkg(unittest.TestCase):
             p = Pkg('doesnotmatter')
             p._list_contents = '/does/not/matter'
             PopenMock = mock.return_value
-            PopenMock.communicate.return_value = [
+            PopenMock.communicate.return_value = ['\n'.join([
                 '/lib/foo.so.1',
+                '/lib/bar.so',
                 '/not/a/shared/object',
-            ]
+                '/not/a/shared/object.soeither',
+            ])]
             PopenMock.returncode = 0
             result = p.shared_objects
             self.assertIn('/lib/foo.so.1', result)
+            self.assertIn('/lib/bar.so', result)
             self.assertNotIn('/not/a/shred/object', result)
+            self.assertNotIn('/not/a/shred/object.soeither', result)
 
             # We want to check that we don't invoke Popen on
             # a second call so let it fail.

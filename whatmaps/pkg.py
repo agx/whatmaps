@@ -38,7 +38,7 @@ class Pkg(object):
 
     type = None
     services = None
-    _so_regex = re.compile(r'(?P<so>/.*\.so(\.[^/]*)$)')
+    _so_regex = re.compile(r'(?P<so>/.*\.so(\.[^/]*)?$)')
     _list_contents = None
 
     def __init__(self, name):
