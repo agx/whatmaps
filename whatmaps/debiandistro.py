@@ -45,6 +45,8 @@ class DebianDistro(Distro):
                       'exim4-daemon-light':  [ 'exim4' ],
                       'exim4-daemon-heavy':  [ 'exim4' ],
                       'qemu-system-x86_64':  [ 'libvirt-guests' ],
+                      'openjdk-6-jre-headless': ['jenkins', 'tomcat7'],
+                      'openjdk-7-jre-headless': ['jenkins', 'tomcat7'],
                     }
 
     # Per package blacklist
