@@ -49,12 +49,18 @@ class Distro(object):
         subprocess.call(klass.restart_service_cmd(service))
 
     @classmethod
+    def is_service_installed(klass, service):
+        """Check wether a service exists on the system"""
+        return True
+
+    @classmethod
     def pkg_services(klass, pkg):
         """
         List of services that package pkg needs restarted that aren't part
         of pkg itself
         """
-        return klass._pkg_services.get(pkg.name, [])
+        return [ s for s in klass._pkg_services.get(pkg.name, [])
+                 if klass.is_service_installed(s) ]
 
     @classmethod
     def pkg_service_blacklist(klass, pkg):
