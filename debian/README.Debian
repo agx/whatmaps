@@ -1,6 +1,0 @@
-To enable apt integration set
-
- Whatmaps::Enable-Restart "1";
-
-in /etc/apt/apt.conf.d/20services.
-
