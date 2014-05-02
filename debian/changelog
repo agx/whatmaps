@@ -1,3 +1,14 @@
+whatmaps (0.0.6-1) unstable; urgency=medium
+
+  * New upstream version 0.0.6
+  * [3029ab6] Make whatmaps a non native package.  It's meant for Debian
+    mostly but can be used on RPM based distros as well.
+  * [f0be66f] Drop README.Debian since it doesn't carry additional info
+    (Closes: #746623)
+  * [e98bdde] Build-depend on python-mock
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 02 May 2014 17:40:32 +0200
+
 whatmaps (0.0.5) unstable; urgency=medium
 
   * [8d0efd3] Improve description
