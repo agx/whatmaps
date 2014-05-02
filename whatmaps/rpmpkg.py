@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # vim: set fileencoding=utf-8 :
 #
 # (C) 2010,2014 Guido Günther <agx@sigxcpu.org>
@@ -15,29 +14,28 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from setuptools import setup
+import os
+import re
 
-data_files = []
+from . pkg import Pkg
 
-try:
-    import lsb_release
-    if lsb_release.get_distro_information()['ID'] in [ 'Debian' ]:
-       data_files = [('../etc/apt/apt.conf.d/',
-                      ['apt/50whatmaps_apt']),
-                     ('../etc/apt/apt.conf.d/',
-                      ['apt/20services']),
-                    ]
-except ImportError:
-    pass
+class RpmPkg(Pkg):
+    type = 'RPM'
+    _init_script_re = re.compile('/etc/rc.d/init.d/[\w\-\.]')
+    _list_contents = [ 'rpm', '-ql', '$pkg_name' ]
 
-setup(name = "whatmaps",
-      author = 'Guido Günther',
-      author_email = 'agx@sigxcpu.org',
-      data_files = data_files,
-      packages = ['whatmaps'],
-      entry_points = {
-          'console_scripts': [ 'whatmaps = whatmaps.command:run' ],
-      },
-)
+    def __init__(self, name):
+        Pkg.__init__(self, name)
 
-# vim:et:ts=4:sw=4:et:sts=4:ai:set list listchars=tab\:»·,trail\:·:
+    @property
+    def services(self):
+        if self._services != None:
+            return self._services
+
+        self._services = []
+        contents = self._get_contents()
+        # Only supports sysvinit so far:
+        for line in contents:
+            if self._init_script_re.match(line):
+                self._services.append(os.path.basename(line.strip()))
+        return self._services
