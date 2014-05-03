@@ -26,6 +26,7 @@ except ImportError:
     lsb_release = None
 
 import logging
+import string
 import subprocess
 import sys
 
