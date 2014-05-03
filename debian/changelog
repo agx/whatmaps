@@ -1,3 +1,9 @@
+whatmaps (0.0.6-2) unstable; urgency=medium
+
+  * [b0fe055] Add missing import
+
+ -- Guido Günther <agx@sigxcpu.org>  Sat, 03 May 2014 11:29:16 +0200
+
 whatmaps (0.0.6-1) unstable; urgency=medium
 
   * New upstream version 0.0.6
