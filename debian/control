@@ -16,13 +16,10 @@ Package: whatmaps
 Architecture: all
 Depends: ${misc:Depends}, ${python:Depends}, lsb-release,
  python-apt
-Description: Find processes mapping shared objects
- After package upgrades processes using a ahared library need to be
- restarted to make use of that updated library (e.g. if the library got a
- security upgrade).
+Description: tool to find processes mapping shared objects
+ After package upgrades (especially security fixes), services using a
+ shared library need to be restarted to make use of the updated version.
  .
- Whatmaps looks for shared objects in packages and finds running programs that
- map them, list them and allows one to restart them.
- .
- It can be integrated with apt to automatically restart services automatically
- on security upgrades.
+ Whatmaps looks for shared objects provided by upgraded packages, lists any
+ running processes that map them, and can integrate with APT to restart
+ services as needed after security upgrades.
