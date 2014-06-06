@@ -1,3 +1,21 @@
+whatmaps (0.0.7-1) unstable; urgency=medium
+
+  [ Justin B Rye ]
+  * [d10e47c] Improve package description (Closes: #747147)
+
+  [ Guido Günther ]
+  * New upstream version 0.0.7
+  * [acbf3dd] Depend on python-pkg-resources needed for the entry point
+  * [a049392] Drop patches applied upstream
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 06 Jun 2014 19:42:09 +0200
+
+whatmaps (0.0.6-2) unstable; urgency=medium
+
+  * [b0fe055] Add missing import
+
+ -- Guido Günther <agx@sigxcpu.org>  Sat, 03 May 2014 11:29:16 +0200
+
 whatmaps (0.0.6-1) unstable; urgency=medium
 
   * New upstream version 0.0.6
