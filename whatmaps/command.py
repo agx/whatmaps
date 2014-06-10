@@ -22,6 +22,7 @@ import glob
 import os
 import logging
 import sys
+import errno
 from optparse import OptionParser
 try:
     import lsb_release
@@ -165,7 +166,14 @@ def main(argv):
         logging.debug("  %s", so)
 
     # Find processes that map them
-    restart_procs = check_maps(get_all_pids(), shared_objects)
+    try:
+        restart_procs = check_maps(get_all_pids(), shared_objects)
+    except IOError as e:
+        if e.errno == errno.EACCES:
+            logging.error("Can't open process maps in '/proc/<pid>/maps', are you root?")
+            return 1
+        else:
+            raise
     logging.debug("Processes that map them:")
     for exe, pids in restart_procs.items():
         logging.debug("  Exe: %s Pids: %s", exe, pids),
