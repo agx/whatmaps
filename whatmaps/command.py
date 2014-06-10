@@ -21,11 +21,7 @@ from __future__ import print_function
 import glob
 import os
 import logging
-import re
-import string
-import subprocess
 import sys
-import errno
 from optparse import OptionParser
 try:
     import lsb_release
