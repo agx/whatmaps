@@ -209,7 +209,7 @@ def main(argv):
         if level > logging.INFO:
             logging.error("Getting Service listing not implemented "
             "for distribution %s - rerun with --verbose to see a list"
-            "of binaries and packages to map a shared objects from %s",
+            "of binaries that map a shared objects from %s",
             distro.id, args)
             return 1
         else:
