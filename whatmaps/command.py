@@ -18,11 +18,12 @@
 
 from __future__ import print_function
 
+import errno
 import glob
 import os
 import logging
+import subprocess
 import sys
-import errno
 from optparse import OptionParser
 try:
     import lsb_release
@@ -32,9 +33,7 @@ except ImportError:
 from . process import Process
 from . debiandistro import DebianDistro
 from . redhatdistro  import FedoraDistro
-from . pkg import Pkg, PkgError
-from . debianpkg import DebianPkg
-from . rpmpkg import RpmPkg
+from . pkg import PkgError
 
 
 def check_maps(procs, shared_objects):

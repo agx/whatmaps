@@ -29,6 +29,7 @@ import logging
 import os
 import subprocess
 import sys
+import string
 
 from . distro import Distro
 from . debianpkg import DebianPkg
