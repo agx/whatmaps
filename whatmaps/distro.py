@@ -28,7 +28,15 @@ except ImportError:
 class Distro(object):
     """
     A distribution
+
     @cvar id: distro id as returned by lsb-release
+
+    @cvar service_blacklist: services that should never be restarted
+    @cvar _pkg_services: A C{dict} that maps packages to services. In
+      case we find binaries that match a key in this hash restart
+      the services listed in values.
+    @cvar _pkg_service_blacklist: if we find binaries in the package
+      listed as key don't restart services listed in values
     """
     id = None
     service_blacklist = set()
