@@ -23,6 +23,12 @@ try:
 except ImportError:
     have_apt_pkg=False
 
+try:
+    import lsb_release
+    have_lsb_release=True
+except ImportError:
+    have_lsb_release=False
+
 from whatmaps.debiandistro import DebianDistro
 from whatmaps.debianpkg import DebianPkg
 
@@ -90,6 +96,7 @@ class TestDebianDistro(unittest.TestCase):
     @patch('apt_pkg.init')
     @patch('apt_pkg.Acquire')
     @unittest.skipUnless(have_apt_pkg, "apt_pkg not installed")
+    @unittest.skipUnless(have_lsb_release, "lsb_release not installed")
     def test_filter_security_updates(self, apt_pkg_acquire, apt_pkg_init):
         pkgs = {'pkg1': DebianPkg('pkg1'),
                 'pkg2': DebianPkg('pkg2'),
