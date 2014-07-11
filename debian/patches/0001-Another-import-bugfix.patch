@@ -1,0 +1,27 @@
+From: =?utf-8?q?Guido_G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Fri, 11 Jul 2014 20:53:31 +0200
+Subject: Another import bugfix
+
+---
+ whatmaps/debiandistro.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/whatmaps/debiandistro.py b/whatmaps/debiandistro.py
+index 9294c9f..3a3bf16 100644
+--- a/whatmaps/debiandistro.py
++++ b/whatmaps/debiandistro.py
+@@ -31,12 +31,12 @@ import subprocess
+ import sys
+ import string
+ 
+-import whatmaps.distro
++from . distro import Distro
+ from . debianpkg import DebianPkg
+ from . pkg import PkgError
+ from . systemd import Systemd
+ 
+-class DebianDistro(whatmaps.distro.Distro):
++class DebianDistro(Distro):
+     "Debian (dpkg) based distribution"
+     id = 'Debian'
+ 
