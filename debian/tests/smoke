@@ -1,0 +1,3 @@
+#!/bin/sh
+
+whatmaps libvirt0 | grep -qs ^libvirt-bin
