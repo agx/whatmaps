@@ -34,6 +34,7 @@ import string
 import distro
 from . debianpkg import DebianPkg
 from . pkg import PkgError
+from . systemd import Systemd
 
 class DebianDistro(distro.Distro):
     "Debian (dpkg) based distribution"
@@ -73,8 +74,12 @@ class DebianDistro(distro.Distro):
         return DebianPkg(pkg)
 
     @classmethod
-    def restart_service_cmd(klass, name):
+    def restart_service_cmd(klass, service):
         """The command that should be used to start a service"""
+        if Systemd.is_running() and service.endswith('.service'):
+            name = service[:-len('.service')]
+        else:
+            name = service
         return ['invoke-rc.d', name, 'restart']
 
     @classmethod

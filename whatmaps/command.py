@@ -28,6 +28,7 @@ from optparse import OptionParser
 from . process import Process
 from . distro import Distro
 from . pkg import PkgError
+from . systemd import Systemd
 
 def check_maps(procs, shared_objects):
     restart_procs = {}
@@ -106,8 +107,25 @@ def find_services(pkgs, distro):
     return all_services
 
 
+def find_systemd_units(procmap, distro):
+    """Find systemd units that contain the given processes"""
+    units = set()
+
+    for dummy, procs in procmap.items():
+        for proc in procs:
+            unit = Systemd.process_to_unit(proc)
+            if not unit:
+                logging.warning("No systemd unit found for '%s'"
+                                "- restart manually" % proc.exe)
+            else:
+                units.add(unit)
+    units -= set([ service + '.service' for service in distro.service_blacklist ])
+    return units
+
+
 def main(argv):
     shared_objects = []
+    services = None
 
     parser = OptionParser(usage='%prog [options] pkg1 [pkg2 pkg3 pkg4]')
     parser.add_option("--debug", action="store_true", dest="debug",
@@ -180,34 +198,38 @@ def main(argv):
     for exe, pids in restart_procs.items():
         logging.debug("  Exe: %s Pids: %s", exe, pids),
 
-    # Find the packages that contain the binaries the processes are
-    # executing
-    pkgs = find_pkgs(restart_procs, distro)
+    if Systemd.is_running():
+        logging.debug("Detected Systemd")
+        services = find_systemd_units(restart_procs, distro)
+    else:
+        # Find the packages that contain the binaries the processes are
+        # executing
+        pkgs = find_pkgs(restart_procs, distro)
 
-    # Find the services in these packages honoring distro specific
-    # mappings and blacklists
-    try:
-        all_services = find_services(pkgs, distro)
-    except NotImplementedError:
-        if level > logging.INFO:
-            logging.error("Getting Service listing not implemented "
-            "for distribution %s - rerun with --verbose to see a list"
-            "of binaries that map a shared objects from %s",
-            distro.id, args)
-            return 1
-        else:
-            return 0
+        # Find the services in these packages honoring distro specific
+        # mappings and blacklists
+        try:
+            services = find_services(pkgs, distro)
+        except NotImplementedError:
+            if level > logging.INFO:
+                logging.error("Getting Service listing not implemented "
+                              "for distribution %s - rerun with --verbose to see a list"
+                              "of binaries that map a shared objects from %s",
+                              distro.id, args)
+                return 1
+            else:
+                return 0
 
     if options.restart:
-        if options.print_cmds and all_services:
-            write_cmd_file(all_services, options.print_cmds, distro)
+        if options.print_cmds and services:
+            write_cmd_file(services, options.print_cmds, distro)
         else:
-            for service in all_services:
+            for service in services:
                 logging.info("Restarting %s" % service)
                 distro.restart_service(service)
-    elif all_services:
+    elif services:
         print("Services that possibly need to be restarted:")
-        for s in all_services:
+        for s in services:
             print(s)
 
     return 0
