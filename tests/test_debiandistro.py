@@ -94,7 +94,7 @@ class TestDebianDistro(unittest.TestCase):
         pkgs = {'pkg1': DebianPkg('pkg1'),
                 'pkg2': DebianPkg('pkg2'),
             }
-        with patch('apt_pkg.Cache') as mock:
+        with patch('apt_pkg.Cache'):
             DebianDistro.filter_security_updates(pkgs)
         apt_pkg_init.assert_called_once_with()
         apt_pkg_acquire.assert_called_once_with()
