@@ -95,8 +95,8 @@ class Distro(object):
     def detect():
         return detect()
 
-import debiandistro
-import redhatdistro
+import whatmaps.debiandistro
+import whatmaps.redhatdistro
 
 def detect():
     """
@@ -119,16 +119,16 @@ def detect():
             # id is None in this case
             pass
 
-    if id == debiandistro.DebianDistro.id:
-        return debiandistro.DebianDistro
-    elif id == redhatdistro.FedoraDistro.id:
-        return redhatdistro.FedoraDistro
+    if id == whatmaps.debiandistro.DebianDistro.id:
+        return whatmaps.debiandistro.DebianDistro
+    elif id == whatmaps.redhatdistro.FedoraDistro.id:
+        return whatmaps.redhatdistro.FedoraDistro
     else:
         if os.path.exists('/usr/bin/dpkg'):
             logging.warning("Unknown distro but dpkg found, assuming Debian")
-            return debiandistro.DebianDistro
+            return whatmaps.debiandistro.DebianDistro
         elif os.path.exists('/bin/rpm'):
             logging.warning("Unknown distro but rpm found, assuming Fedora")
-            return debiandistro.FedoraDistro
+            return whatmaps.debiandistro.FedoraDistro
         else:
             return None
