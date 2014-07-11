@@ -64,6 +64,48 @@ def write_cmd_file(services, cmd_file, distro):
     os.chmod(cmd_file, 0o755)
 
 
+def find_pkgs(procs, distro):
+    """
+    Find packages that contain the binaries of the given processes
+    """
+    pkgs = {}
+    for proc in procs:
+        pkg = distro.pkg_by_file(proc)
+        if not pkg:
+            logging.warning("No package found for '%s' - restart manually" % proc)
+        else:
+            if pkg.name in pkgs:
+                pkgs[pkg.name].procs.append(proc)
+            else:
+                pkg.procs = [ proc ]
+                pkgs[pkg.name] = pkg
+
+    logging.info("Packages that ship the affected binaries:")
+    for pkg in pkgs.values():
+        logging.info("  Pkg: %s, binaries: %s" % (pkg.name, pkg.procs))
+
+    return pkgs
+
+
+def find_services(pkgs, distro):
+    """
+    Determine the services in pkgs honoring distro specific mappings
+    and blacklists
+    """
+    all_services = set()
+
+    for pkg in pkgs.values():
+        services = set(pkg.services + distro.pkg_services(pkg))
+        services -= set(distro.pkg_service_blacklist(pkg))
+        if not services:
+            logging.warning("No service script found in '%s' for '%s' "
+                            "- restart manually" % (pkg.name, pkg.procs))
+        else:
+            all_services.update(services)
+    all_services -= distro.service_blacklist
+    return all_services
+
+
 def main(argv):
     shared_objects = []
 
@@ -138,34 +180,14 @@ def main(argv):
     for exe, pids in restart_procs.items():
         logging.debug("  Exe: %s Pids: %s", exe, pids),
 
-    # Find packages that contain the binaries of these processes
-    pkgs = {}
-    for proc in restart_procs:
-        pkg = distro.pkg_by_file(proc)
-        if not pkg:
-            logging.warning("No package found for '%s' - restart manually" % proc)
-        else:
-            if pkg.name in pkgs:
-                pkgs[pkg.name].procs.append(proc)
-            else:
-                pkg.procs = [ proc ]
-                pkgs[pkg.name] = pkg
+    # Find the packages that contain the binaries the processes are
+    # executing
+    pkgs = find_pkgs(restart_procs, distro)
 
-    logging.info("Packages that ship the affected binaries:")
-    for pkg in pkgs.values():
-        logging.info("  Pkg: %s, binaries: %s" % (pkg.name, pkg.procs))
-
-    all_services = set()
+    # Find the services in these packages honoring distro specific
+    # mappings and blacklists
     try:
-        for pkg in pkgs.values():
-            services = set(pkg.services + distro.pkg_services(pkg))
-            services -= set(distro.pkg_service_blacklist(pkg))
-            if not services:
-                logging.warning("No service script found in '%s' for '%s' "
-                                "- restart manually" % (pkg.name, pkg.procs))
-            else:
-                all_services.update(services)
-        all_services -= distro.service_blacklist
+        all_services = find_services(pkgs, distro)
     except NotImplementedError:
         if level > logging.INFO:
             logging.error("Getting Service listing not implemented "
