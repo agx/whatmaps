@@ -26,16 +26,18 @@ except ImportError:
     lsb_release = None
 
 import logging
-import string
+import os
 import subprocess
 import sys
+import string
 
-from . distro import Distro
+import whatmaps.distro
 from . debianpkg import DebianPkg
 from . pkg import PkgError
+from . systemd import Systemd
 
-class DebianDistro(Distro):
-    "Debian (dpkg) based distribution"""
+class DebianDistro(whatmaps.distro.Distro):
+    "Debian (dpkg) based distribution"
     id = 'Debian'
 
     _pkg_services = { 'apache2-mpm-worker':  [ 'apache2' ],
@@ -72,8 +74,18 @@ class DebianDistro(Distro):
         return DebianPkg(pkg)
 
     @classmethod
-    def restart_service_cmd(klass, name):
+    def restart_service_cmd(klass, service):
+        """The command that should be used to start a service"""
+        if Systemd.is_running() and service.endswith('.service'):
+            name = service[:-len('.service')]
+        else:
+            name = service
         return ['invoke-rc.d', name, 'restart']
+
+    @classmethod
+    def is_service_installed(klass, name):
+        """Whether the system has this service"""
+        return os.path.exists('/etc/init.d/%s' % name)
 
     @classmethod
     def has_apt(klass):

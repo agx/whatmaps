@@ -18,27 +18,17 @@
 
 from __future__ import print_function
 
+import errno
 import glob
 import os
 import logging
-import re
-import string
-import subprocess
 import sys
-import errno
 from optparse import OptionParser
-try:
-    import lsb_release
-except ImportError:
-    lsb_release = None
 
 from . process import Process
-from . debiandistro import DebianDistro
-from . redhatdistro  import FedoraDistro
-from . pkg import Pkg, PkgError
-from . debianpkg import DebianPkg
-from . rpmpkg import RpmPkg
-
+from . distro import Distro
+from . pkg import PkgError
+from . systemd import Systemd
 
 def check_maps(procs, shared_objects):
     restart_procs = {}
@@ -64,38 +54,6 @@ def get_all_pids():
     return processes
 
 
-def detect_distro():
-    id = None
-
-    if lsb_release:
-        id = lsb_release.get_distro_information()['ID']
-    else:
-        try:
-            lsb_cmd = subprocess.Popen(['lsb_release', '--id', '-s'],
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
-            output = lsb_cmd.communicate()[0]
-            if not lsb_cmd.returncode:
-               id = output.strip()
-        except OSError:
-            # id is None in this case
-            pass
-
-    if id == DebianDistro.id:
-        return DebianDistro
-    elif id == FedoraDistro.id:
-        return FedoraDistro
-    else:
-        if os.path.exists('/usr/bin/dpkg'):
-            logging.warning("Unknown distro but dpkg found, assuming Debian")
-            return DebianDistro
-        elif os.path.exists('/bin/rpm'):
-            logging.warning("Unknown distro but rpm found, assuming Fedora")
-            return FedoraDistro
-        else:
-            return None
-
-
 def write_cmd_file(services, cmd_file, distro):
     "Write out commands needed to restart the services to a file"
     out = open(cmd_file, 'w')
@@ -107,8 +65,67 @@ def write_cmd_file(services, cmd_file, distro):
     os.chmod(cmd_file, 0o755)
 
 
+def find_pkgs(procs, distro):
+    """
+    Find packages that contain the binaries of the given processes
+    """
+    pkgs = {}
+    for proc in procs:
+        pkg = distro.pkg_by_file(proc)
+        if not pkg:
+            logging.warning("No package found for '%s' - restart manually" % proc)
+        else:
+            if pkg.name in pkgs:
+                pkgs[pkg.name].procs.append(proc)
+            else:
+                pkg.procs = [ proc ]
+                pkgs[pkg.name] = pkg
+
+    logging.info("Packages that ship the affected binaries:")
+    for pkg in pkgs.values():
+        logging.info("  Pkg: %s, binaries: %s" % (pkg.name, pkg.procs))
+
+    return pkgs
+
+
+def find_services(pkgs, distro):
+    """
+    Determine the services in pkgs honoring distro specific mappings
+    and blacklists
+    """
+    all_services = set()
+
+    for pkg in pkgs.values():
+        services = set(pkg.services + distro.pkg_services(pkg))
+        services -= set(distro.pkg_service_blacklist(pkg))
+        if not services:
+            logging.warning("No service script found in '%s' for '%s' "
+                            "- restart manually" % (pkg.name, pkg.procs))
+        else:
+            all_services.update(services)
+    all_services -= distro.service_blacklist
+    return all_services
+
+
+def find_systemd_units(procmap, distro):
+    """Find systemd units that contain the given processes"""
+    units = set()
+
+    for dummy, procs in procmap.items():
+        for proc in procs:
+            unit = Systemd.process_to_unit(proc)
+            if not unit:
+                logging.warning("No systemd unit found for '%s'"
+                                "- restart manually" % proc.exe)
+            else:
+                units.add(unit)
+    units -= set([ service + '.service' for service in distro.service_blacklist ])
+    return units
+
+
 def main(argv):
     shared_objects = []
+    services = None
 
     parser = OptionParser(usage='%prog [options] pkg1 [pkg2 pkg3 pkg4]')
     parser.add_option("--debug", action="store_true", dest="debug",
@@ -134,7 +151,7 @@ def main(argv):
     logging.basicConfig(level=level,
                         format='%(levelname)s: %(message)s')
 
-    distro = detect_distro()
+    distro = Distro.detect()
     if not distro:
         logging.error("Unsupported Distribution")
         return 1
@@ -169,59 +186,50 @@ def main(argv):
         logging.debug("  %s", so)
 
     # Find processes that map them
-    restart_procs = check_maps(get_all_pids(), shared_objects)
+    try:
+        restart_procs = check_maps(get_all_pids(), shared_objects)
+    except IOError as e:
+        if e.errno == errno.EACCES:
+            logging.error("Can't open process maps in '/proc/<pid>/maps', are you root?")
+            return 1
+        else:
+            raise
     logging.debug("Processes that map them:")
     for exe, pids in restart_procs.items():
         logging.debug("  Exe: %s Pids: %s", exe, pids),
 
-    # Find packages that contain the binaries of these processes
-    pkgs = {}
-    for proc in restart_procs:
-        pkg = distro.pkg_by_file(proc)
-        if not pkg:
-            logging.warning("No package found for '%s' - restart manually" % proc)
-        else:
-            if pkg.name in pkgs:
-                pkgs[pkg.name].procs.append(proc)
-            else:
-                pkg.procs = [ proc ]
-                pkgs[pkg.name] = pkg
+    if Systemd.is_running():
+        logging.debug("Detected Systemd")
+        services = find_systemd_units(restart_procs, distro)
+    else:
+        # Find the packages that contain the binaries the processes are
+        # executing
+        pkgs = find_pkgs(restart_procs, distro)
 
-    logging.info("Packages that ship the affected binaries:")
-    for pkg in pkgs.values():
-        logging.info("  Pkg: %s, binaries: %s" % (pkg.name, pkg.procs))
-
-    all_services = set()
-    try:
-        for pkg in pkgs.values():
-            services = set(pkg.services + distro.pkg_services(pkg))
-            services -= set(distro.pkg_service_blacklist(pkg))
-            if not services:
-                logging.warning("No service script found in '%s' for '%s' "
-                                "- restart manually" % (pkg.name, pkg.procs))
+        # Find the services in these packages honoring distro specific
+        # mappings and blacklists
+        try:
+            services = find_services(pkgs, distro)
+        except NotImplementedError:
+            if level > logging.INFO:
+                logging.error("Getting Service listing not implemented "
+                              "for distribution %s - rerun with --verbose to see a list"
+                              "of binaries that map a shared objects from %s",
+                              distro.id, args)
+                return 1
             else:
-                all_services.update(services)
-        all_services -= distro.service_blacklist
-    except NotImplementedError:
-        if level > logging.INFO:
-            logging.error("Getting Service listing not implemented "
-            "for distribution %s - rerun with --verbose to see a list"
-            "of binaries and packages to map a shared objects from %s",
-            distro.id, args)
-            return 1
-        else:
-            return 0
+                return 0
 
     if options.restart:
-        if options.print_cmds and all_services:
-            write_cmd_file(all_services, options.print_cmds, distro)
+        if options.print_cmds and services:
+            write_cmd_file(services, options.print_cmds, distro)
         else:
-            for service in all_services:
+            for service in services:
                 logging.info("Restarting %s" % service)
                 distro.restart_service(service)
-    elif all_services:
+    elif services:
         print("Services that possibly need to be restarted:")
-        for s in all_services:
+        for s in services:
             print(s)
 
     return 0

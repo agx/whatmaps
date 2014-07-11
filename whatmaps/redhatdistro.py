@@ -20,7 +20,6 @@ import re
 import subprocess
 
 from . distro import Distro
-from . pkg import PkgError
 from . rpmpkg import RpmPkg
 
 class RedHatDistro(Distro):
