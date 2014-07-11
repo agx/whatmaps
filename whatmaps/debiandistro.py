@@ -31,12 +31,12 @@ import subprocess
 import sys
 import string
 
-import whatmaps.distro
+from . distro import Distro
 from . debianpkg import DebianPkg
 from . pkg import PkgError
 from . systemd import Systemd
 
-class DebianDistro(whatmaps.distro.Distro):
+class DebianDistro(Distro):
     "Debian (dpkg) based distribution"
     id = 'Debian'
 
