@@ -1,3 +1,15 @@
+whatmaps (0.0.8-1) unstable; urgency=medium
+
+  * [ac817c1] Print userfriendly message if not root (Closes: #751088)
+  * [c6168df] Add upstream-branch to gbp.conf
+  * [e1b9e7f] pkg_services: Check if a service is actually installed.
+  * [f758314] Add systemd support
+  * [d6dba76] Add simple autopkgtest
+  * [e048b5f] Abort early if we found a match. This speeds up the output and
+    avoids duplicate printouts
+
+ -- Guido Günther <agx@sigxcpu.org>  Mon, 14 Jul 2014 16:58:19 +0200
+
 whatmaps (0.0.7-1) unstable; urgency=medium
 
   [ Justin B Rye ]
