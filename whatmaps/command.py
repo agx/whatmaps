@@ -39,7 +39,7 @@ def check_maps(procs, shared_objects):
                     restart_procs[proc.exe] += [ proc ]
                 else:
                     restart_procs[proc.exe] = [ proc ]
-                continue
+                break
     return restart_procs
 
 
