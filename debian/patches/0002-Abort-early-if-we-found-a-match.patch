@@ -1,0 +1,24 @@
+From: =?utf-8?q?Guido_G=C3=BCnther?= <agx@sigxcpu.org>
+Date: Mon, 14 Jul 2014 16:12:43 +0200
+Subject: Abort early if we found a match
+
+Once we found a shared object that a process maps we don't need to
+continue with the other shared objects since one is enough to require
+a process restart.
+---
+ whatmaps/command.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/whatmaps/command.py b/whatmaps/command.py
+index 7690ef8..e649cbb 100755
+--- a/whatmaps/command.py
++++ b/whatmaps/command.py
+@@ -39,7 +39,7 @@ def check_maps(procs, shared_objects):
+                     restart_procs[proc.exe] += [ proc ]
+                 else:
+                     restart_procs[proc.exe] = [ proc ]
+-                continue
++                break
+     return restart_procs
+ 
+ 
