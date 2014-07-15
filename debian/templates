@@ -1,0 +1,11 @@
+Template: whatmaps/enable_service_restarts
+Type: boolean
+Default: false
+_Description: Automatically restart services after shared library security updates?
+ Services need to be restarted to benefit from updates of shared libraries they
+ depend on. Without that they remain vulnerable to security bugs fixed in these
+ updates.
+ .
+ Automatic service restarts are only done if apt fetched the library from a
+ source providing security updates. This also affects packages installed
+ via unattended-upgrades.

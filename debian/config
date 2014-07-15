@@ -1,0 +1,21 @@
+#!/bin/sh -e
+
+APT_CONF=/etc/apt/apt.conf.d/20services
+
+. /usr/share/debconf/confmodule
+db_version 2.0
+
+if [ -f $APT_CONF ]; then
+    CURRENT=$(sed -ne 's,^\s*Whatmaps::Enable-Restart\s\+"\(\S\+\)"\s*;,\1,p' $APT_CONF)
+    case $CURRENT in
+        1|true)
+           CURRENT="true"
+           ;;
+        *) CURRENT="false"
+           ;;
+    esac
+    db_set whatmaps/enable_service_restarts $CURRENT
+fi
+
+db_input medium whatmaps/enable_service_restarts || true
+db_go
