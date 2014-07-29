@@ -1,3 +1,9 @@
+whatmaps (0.0.8-2) unstable; urgency=medium
+
+  * [cca6b44] Add debconf question to enable automatic service restarts
+
+ -- Guido Günther <agx@sigxcpu.org>  Tue, 29 Jul 2014 13:10:50 +0200
+
 whatmaps (0.0.8-1) unstable; urgency=medium
 
   * [ac817c1] Print userfriendly message if not root (Closes: #751088)
