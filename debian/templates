@@ -1,11 +1,20 @@
+# These templates have been reviewed by the debian-l10n-english
+# team
+#
+# If modifications/additions/rewording are needed, please ask
+# debian-l10n-english@lists.debian.org for advice.
+#
+# Even minor modifications require translation updates and such
+# changes should be coordinated with translators and reviewers.
+
 Template: whatmaps/enable_service_restarts
 Type: boolean
 Default: false
-_Description: Automatically restart services after shared library security updates?
+_Description: Automatically restart services after library security updates?
  Services need to be restarted to benefit from updates of shared libraries they
- depend on. Without that they remain vulnerable to security bugs fixed in these
+ depend on. Otherwise they remain vulnerable to security bugs fixed in these
  updates.
  .
- Automatic service restarts are only done if apt fetched the library from a
+ Automatic service restarts are only done if APT fetched the library from a
  source providing security updates. This also affects packages installed
- via unattended-upgrades.
+ via "unattended-upgrades".
