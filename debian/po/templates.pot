@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: whatmaps\n"
 "Report-Msgid-Bugs-To: whatmaps@packages.debian.org\n"
-"POT-Creation-Date: 2014-07-15 13:22+0200\n"
+"POT-Creation-Date: 2014-08-21 20:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,24 +19,24 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:1001
-msgid "Automatically restart services after shared library security updates?"
+#: ../templates:2001
+msgid "Automatically restart services after library security updates?"
 msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:1001
+#: ../templates:2001
 msgid ""
 "Services need to be restarted to benefit from updates of shared libraries "
-"they depend on. Without that they remain vulnerable to security bugs fixed "
-"in these updates."
+"they depend on. Otherwise they remain vulnerable to security bugs fixed in "
+"these updates."
 msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../templates:1001
+#: ../templates:2001
 msgid ""
-"Automatic service restarts are only done if apt fetched the library from a "
+"Automatic service restarts are only done if APT fetched the library from a "
 "source providing security updates. This also affects packages installed via "
-"unattended-upgrades."
+"\"unattended-upgrades\"."
 msgstr ""
