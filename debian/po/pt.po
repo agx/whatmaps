@@ -1,0 +1,53 @@
+# Portuguese translations of debconf messages for the whatmaps package.
+# Copyright (C) 2014 THE whatmaps'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the whatmaps package.
+#
+# Paulo Tomé <paulo.jorge.tome@gmail.com>, 2014.
+msgid ""
+msgstr ""
+"Project-Id-Version: whatmaps 0.0.8-3\n"
+"Report-Msgid-Bugs-To: whatmaps@packages.debian.org\n"
+"POT-Creation-Date: 2014-08-20 06:56+0200\n"
+"PO-Revision-Date: 2014-08-25 00:20+0100\n"
+"Last-Translator: Paulo Tomé <paulo.jorge.tome@gmail.com>\n"
+"Language-Team: Portuguese <traduz@debianpt.org>\n"
+"Language: pt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 1.4\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid "Automatically restart services after library security updates?"
+msgstr ""
+"Reiniciar automaticamente os serviços após actualizações de segurança das "
+"bibliotecas?"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"Services need to be restarted to benefit from updates of shared libraries "
+"they depend on. Otherwise they remain vulnerable to security bugs fixed in "
+"these updates."
+msgstr ""
+"Os serviços necessitam de ser reiniciados de modo a beneficiarem de "
+"actualizações das bibliotecas partilhadas das quais dependem. Caso contrário "
+"ficam vulneráveis a erros de segurança corrigidos nestas actualizações."
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"Automatic service restarts are only done if APT fetched the library from a "
+"source providing security updates. This also affects packages installed via "
+"\"unattended-upgrades\"."
+msgstr ""
+"Reinicializações automáticas do serviço são apenas executadas se APT obteve a "
+"biblioteca de uma fonte que forneça actualizações de segurança. Isto também "
+"afecta pacotes instalados via \"unattended-upgrades\"."
+
+
