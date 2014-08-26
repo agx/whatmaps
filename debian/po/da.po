@@ -1,0 +1,47 @@
+# Danish translation whatmaps.
+# Copyright (C) 2014 the whatmaps team.
+# This file is distributed under the same license as the whatmaps package.
+# Joe Hansen <joedalton2@yahoo.dk>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: whatmaps\n"
+"Report-Msgid-Bugs-To: whatmaps@packages.debian.org\n"
+"POT-Creation-Date: 2014-08-20 06:56+0200\n"
+"PO-Revision-Date: 2014-08-21 22:21+0100\n"
+"Last-Translator: Joe Hansen <joedalton2@yahoo.dk>\n"
+"Language-Team: Danish <debian-l10n-danish@lists.debian.org>\n"
+"Language: da\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid "Automatically restart services after library security updates?"
+msgstr "Automatisk genstart tjenester efter bibliotekssikkerhedsopdateringer?"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"Services need to be restarted to benefit from updates of shared libraries "
+"they depend on. Otherwise they remain vulnerable to security bugs fixed in "
+"these updates."
+msgstr ""
+"Tjenester skal genstartes for at drage fordel af opdateringer af delte "
+"biblioteker, de afhænger af. Ellers forbliver de sårbare over for "
+"sikkerhedsrelaterede fejl rettet i disse opdateringer."
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"Automatic service restarts are only done if APT fetched the library from a "
+"source providing security updates. This also affects packages installed via "
+"\"unattended-upgrades\"."
+msgstr ""
+"Automatisk tjenestegenstart udføres kun hvis APT hentede biblioteket fra "
+"en kilde, der leverer sikkerhedsopdateringer. Dette påvirker også pakker "
+"installeret via »unattended-upgrades«."
