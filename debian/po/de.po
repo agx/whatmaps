@@ -1,0 +1,50 @@
+# German debconf translation of whatmaps.
+# This file is distributed under the same license as the whatmaps package.
+# Copyright (C) 2010 Guido Günther <agx@sigxcpu.org>.
+# Copyright (C) of this file 2014 Chris Leick <c.leick@vollbio.de>.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: whatmaps 0.0.8-3\n"
+"Report-Msgid-Bugs-To: whatmaps@packages.debian.org\n"
+"POT-Creation-Date: 2014-08-20 06:56+0200\n"
+"PO-Revision-Date: 2014-08-21 11:41+0100\n"
+"Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
+"Language-Team: German <debian-l10n-german@lists.debian.org>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid "Automatically restart services after library security updates?"
+msgstr ""
+"Sollen die Dienste nach den Sicherheitsaktualisierungen der Bibliotheken "
+"automatisch neu gestartet werden?"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"Services need to be restarted to benefit from updates of shared libraries "
+"they depend on. Otherwise they remain vulnerable to security bugs fixed in "
+"these updates."
+msgstr ""
+"Dienste müssen neu gestartet werden, damit ihnen die Aktualisierungen der "
+"gemeinsam benutzen Bibliotheken zugute kommen, von denen sie abhängen. "
+"Andernfalls bleiben sie für sicherheitskritische Fehler verwundbar, die in "
+"diesen Aktualisierungen behoben wurden."
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"Automatic service restarts are only done if APT fetched the library from a "
+"source providing security updates. This also affects packages installed via "
+"\"unattended-upgrades\"."
+msgstr ""
+"Dienste werden nur dann automatisch neu gestartet, wenn APT die Bibliothek "
+"von einer Quelle bezogen hat, die Sicherheitsaktualisierungen bereitstellt. "
+"Dies betrifft auch Pakete, die per »unattended-upgrades« installiert wurden."
