@@ -1,0 +1,47 @@
+# Czech PO debconf template translation of whatmaps.
+# Copyright (C) 2014 Michal Simunek <michal.simunek@gmail.com>
+# This file is distributed under the same license as the whatmaps package.
+# Michal Simunek <michal.simunek@gmail.com>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: whatmaps 0.0.8-3\n"
+"Report-Msgid-Bugs-To: whatmaps@packages.debian.org\n"
+"POT-Creation-Date: 2014-08-20 06:56+0200\n"
+"PO-Revision-Date: 2014-09-01 10:16+0200\n"
+"Last-Translator: Michal Simunek <michal.simunek@gmail.com>\n"
+"Language-Team: Czech <debian-l10n-czech@lists.debian.org>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid "Automatically restart services after library security updates?"
+msgstr "Restartovat automaticky služby po bezpečnostních aktualizacích knihovny?"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"Services need to be restarted to benefit from updates of shared libraries "
+"they depend on. Otherwise they remain vulnerable to security bugs fixed in "
+"these updates."
+msgstr ""
+"Aby služby využívaly aktualizace sdílených knihoven na kterých závisí, je "
+"třeba je restartovat. V opačném případě zůstanou zranitelné vůči bezpečnostním "
+"chybám, které tyto aktualizace opravují."
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"Automatic service restarts are only done if APT fetched the library from a "
+"source providing security updates. This also affects packages installed via "
+"\"unattended-upgrades\"."
+msgstr ""
+"Automatické restartování služeb se provádí pouze tehdy, když API obdrží "
+"knihovnu ze zdroje poskytujícího bezpečnostní aktualizace. To se vztahuje "
+"také na balíčky nainstalované přes \"unattended-upgrades\"."
