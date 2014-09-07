@@ -1,0 +1,72 @@
+# whatmaps po-debconf translation to Spanish
+# Copyright (C) 2014 Software in the Public Interest
+# This file is distributed under the same license as the whatmaps package.
+#
+# Changes:
+#   - Initial translation
+#       Matías A. Bellone <matiasbellone+debian@gmail.com>, 2014
+#
+# Traductores, si no conocen el formato PO, merece la pena leer la
+# documentación de gettext, especialmente las secciones dedicadas a este
+# formato, por ejemplo ejecutando:
+#       info -n '(gettext)PO Files'
+#       info -n '(gettext)Header Entry'
+#
+# Equipo de traducción al español, por favor lean antes de traducir
+# los siguientes documentos:
+#
+#   - El proyecto de traducción de Debian al español
+#     http://www.debian.org/intl/spanish/
+#     especialmente las notas y normas de traducción en
+#     http://www.debian.org/intl/spanish/notas
+#
+#   - La guía de traducción de po's de debconf:
+#     /usr/share/doc/po-debconf/README-trans
+#     o http://www.debian.org/intl/l10n/po-debconf/README-trans
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: whatmaps\n"
+"Report-Msgid-Bugs-To: whatmaps@packages.debian.org\n"
+"POT-Creation-Date: 2014-08-20 06:56+0200\n"
+"PO-Revision-Date: 2014-08-29 21:45-0300\n"
+"Last-Translator: Matías A. Bellone <matiasbellone+debian@gmail.com>\n"
+"Language-Team: Debian l10n Spanish <debian-l10n-spanish@lists.debian.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid "Automatically restart services after library security updates?"
+msgstr ""
+"¿Desea reiniciar los servicios automáticamente luego de realizar las "
+"actualizaciones de seguridad de las bibliotecas?"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"Services need to be restarted to benefit from updates of shared libraries "
+"they depend on. Otherwise they remain vulnerable to security bugs fixed in "
+"these updates."
+msgstr ""
+"Es necesario reiniciar los servicios para que se apliquen las "
+"actualizaciones de las bibliotecas compartidas en las que dependen. De "
+"lo contrario, seguirán siendo vulnerables a los errores de seguridad "
+"corregidos en dichas actualizaciones."
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"Automatic service restarts are only done if APT fetched the library from a "
+"source providing security updates. This also affects packages installed via "
+"\"unattended-upgrades\"."
+msgstr ""
+"Sólo se reiniciarán automáticamente los servicios si APT descargó la "
+"biblioteca desde una fuente que proporciona actualizaciones de seguridad. "
+"Esto también afecta los paquetes instalados a través de «unattended-"
+"upgrades»."
