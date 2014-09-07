@@ -1,3 +1,35 @@
+whatmaps (0.0.8-3) unstable; urgency=medium
+
+  * [ac2e64b] Nicer wording for debconf template.
+    Thanks to Justin B Rye and Christian PERRIER (Closes: #756584)
+  * [4c73129] Add ru debconf translation.
+    Thanks to Yuri Kozlov (Closes: #758801)
+  * [7a4a474] Update debconf template
+  * [c9e74f8] Add da Debconf translation.
+    Thanks to Joe Dalton (Closes: #758841)
+  * [f655b57] Add pt Debconf translation.
+    Thanks to Paulo Tomé (Closes: #759167)
+  * [6a78260] Add de Debconf translation.
+    Thanks to Chris Leick (Closes: #759365)
+  * [732e071] Add cs Debconf translation.
+    Thanks to Michal Simunek (Closes: #760154)
+  * [620102c] Add pl Debconf translation.
+    Thanks to Michał Kułach (Closes: #760181)
+  * [2fd0b79] Add fr Debconf translation.
+    Thanks to jean-pierre giraud (Closes: #760264)
+  * [381411c] Add pt_BR Debconf translation.
+    Thanks to Adriano Rafael Gomes (Closes: #760296)
+  * [62fb090] Add ja Debconf translation.
+    Thanks to victory (Closes: #760367)
+  * [10377a5] Add it Debconf translation.
+    Thanks to Beatrice Torracca (Closes: #760398)
+  * [913aa63] Add es Debconf translation.
+    Thanks to Matias A. Bellone (Closes: #760617)
+  * [1c5d5f6] Reformat Debconf translations.
+    Thanks to Christian PERRIER (Closes: #756584)
+
+ -- Guido Günther <agx@sigxcpu.org>  Sun, 07 Sep 2014 09:12:18 +0200
+
 whatmaps (0.0.8-2) unstable; urgency=medium
 
   * [cca6b44] Add debconf question to enable automatic service restarts
