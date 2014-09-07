@@ -30,9 +30,9 @@ msgid ""
 "they depend on. Otherwise they remain vulnerable to security bugs fixed in "
 "these updates."
 msgstr ""
-"サービスが依存している共有ライブラリの更新を反映させるためにはサービスを再起動"
-"する必要があります。それまではこの更新で修正されたセキュリティバグに対して脆弱"
-"なままです。"
+"サービスが依存している共有ライブラリの更新を反映させるためにはサービスを再起"
+"動する必要があります。それまではこの更新で修正されたセキュリティバグに対して"
+"脆弱なままです。"
 
 #. Type: boolean
 #. Description

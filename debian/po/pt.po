@@ -46,8 +46,6 @@ msgid ""
 "source providing security updates. This also affects packages installed via "
 "\"unattended-upgrades\"."
 msgstr ""
-"Reinicializações automáticas do serviço são apenas executadas se APT obteve a "
-"biblioteca de uma fonte que forneça actualizações de segurança. Isto também "
-"afecta pacotes instalados via \"unattended-upgrades\"."
-
-
+"Reinicializações automáticas do serviço são apenas executadas se APT obteve "
+"a biblioteca de uma fonte que forneça actualizações de segurança. Isto "
+"também afecta pacotes instalados via \"unattended-upgrades\"."

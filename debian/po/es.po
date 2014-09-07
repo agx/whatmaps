@@ -54,9 +54,9 @@ msgid ""
 "these updates."
 msgstr ""
 "Es necesario reiniciar los servicios para que se apliquen las "
-"actualizaciones de las bibliotecas compartidas en las que dependen. De "
-"lo contrario, seguirán siendo vulnerables a los errores de seguridad "
-"corregidos en dichas actualizaciones."
+"actualizaciones de las bibliotecas compartidas en las que dependen. De lo "
+"contrario, seguirán siendo vulnerables a los errores de seguridad corregidos "
+"en dichas actualizaciones."
 
 #. Type: boolean
 #. Description

@@ -49,6 +49,5 @@ msgid ""
 msgstr ""
 "Automatyczny restart usług ma miejsce jedynie wtedy, gdy APT pobiera "
 "biblioteki ze źródła zapewniającego poprawki bezpieczeństwa. Dotyczy to "
-"również pakietów instalowanych za pomocą \"unattended-upgrades\" "
-"(automatycznych aktualizacji)."
-
+"również pakietów instalowanych za pomocą \"unattended-upgrades"
+"\" (automatycznych aktualizacji)."

@@ -22,7 +22,8 @@ msgstr ""
 #: ../templates:2001
 msgid "Automatically restart services after library security updates?"
 msgstr ""
-"Redémarrer les services après les mises à jour de sécurité des bibliothèques ?"
+"Redémarrer les services après les mises à jour de sécurité des "
+"bibliothèques ?"
 
 #. Type: boolean
 #. Description
@@ -44,7 +45,7 @@ msgid ""
 "source providing security updates. This also affects packages installed via "
 "\"unattended-upgrades\"."
 msgstr ""
-"Le redémarrage automatique des services ne se produit que si APT récupère les "
-"bibliothèques d'une source offrant des mises à jour de sécurité. Cela affecte "
-"aussi les paquets installés par l'intermédiaire d'« unattended-upgrades »."
-
+"Le redémarrage automatique des services ne se produit que si APT récupère "
+"les bibliothèques d'une source offrant des mises à jour de sécurité. Cela "
+"affecte aussi les paquets installés par l'intermédiaire d'« unattended-"
+"upgrades »."

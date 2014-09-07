@@ -20,7 +20,8 @@ msgstr ""
 #. Description
 #: ../templates:2001
 msgid "Automatically restart services after library security updates?"
-msgstr "Restartovat automaticky služby po bezpečnostních aktualizacích knihovny?"
+msgstr ""
+"Restartovat automaticky služby po bezpečnostních aktualizacích knihovny?"
 
 #. Type: boolean
 #. Description
@@ -31,8 +32,8 @@ msgid ""
 "these updates."
 msgstr ""
 "Aby služby využívaly aktualizace sdílených knihoven na kterých závisí, je "
-"třeba je restartovat. V opačném případě zůstanou zranitelné vůči bezpečnostním "
-"chybám, které tyto aktualizace opravují."
+"třeba je restartovat. V opačném případě zůstanou zranitelné vůči "
+"bezpečnostním chybám, které tyto aktualizace opravují."
 
 #. Type: boolean
 #. Description
