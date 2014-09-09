@@ -1,3 +1,11 @@
+whatmaps (0.0.8-4) unstable; urgency=medium
+
+  * [47c0bfa] Don't create backup copies of 20services
+    and remove them if existent
+    Thanks to Johannes Hubertz for pointing this out
+
+ -- Guido Günther <agx@sigxcpu.org>  Tue, 09 Sep 2014 10:02:39 +0200
+
 whatmaps (0.0.8-3) unstable; urgency=medium
 
   * [ac2e64b] Nicer wording for debconf template.
