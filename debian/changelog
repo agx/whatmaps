@@ -1,3 +1,11 @@
+whatmaps (0.0.8-5) unstable; urgency=medium
+
+  * [617fed4] Add sv Debconf translation.  Thanks to Martin Bagge (Closes:
+    #761973)
+  * [1a7a8b9] Fix smoketest. The name of the libvirt service changed
+
+ -- Guido Günther <agx@sigxcpu.org>  Sat, 27 Sep 2014 13:42:48 +0200
+
 whatmaps (0.0.8-4) unstable; urgency=medium
 
   * [47c0bfa] Don't create backup copies of 20services
