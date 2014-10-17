@@ -17,12 +17,14 @@ set -e
 case "$1" in
     install|upgrade)
 	if dpkg --compare-versions "$2" lt-nl "0.0.8-3~"; then
-	    # Remove backup copies of services file
-	    md5=$(md5sum /etc/apt/apt.conf.d/20servicese | sed -e 's/ .*//')
-	    case "$md5" in
-              074e684668c83b8a98c5eeb8257c88f2|509ad2c35aa4da3153dd6e70941e060b)
-	          rm -f /etc/apt/apt.conf.d/20servicese
-	    esac
+	    if [ -f /etc/apt/apt.conf.d/20servicese ]; then
+	        # Remove errnoneous backup copies of services file
+	        md5=$(md5sum /etc/apt/apt.conf.d/20servicese | sed -e 's/ .*//')
+	        case "$md5" in
+                    074e684668c83b8a98c5eeb8257c88f2|509ad2c35aa4da3153dd6e70941e060b)
+	            rm -f /etc/apt/apt.conf.d/20servicese
+	        esac
+	    fi
 	fi
     ;;
 
