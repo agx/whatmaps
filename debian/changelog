@@ -1,3 +1,17 @@
+whatmaps (0.0.9-1) unstable; urgency=medium
+
+  * New upstream version:
+      * Install apt.conf configuration on derivatives too (Closes: #761054)
+      * Fix service detection with newer systemd (as in Debian Jessie)
+      * Make logging consistent
+  * [36fd4ee] Avoid error message on missing file.
+    Don't try to get the md5sum of a nonexistent file to avoid
+        md5sum: /etc/apt/apt.conf.d/20servicese: No such file or directory
+    which is confusing.
+  * Drop all patches merged upstream
+
+ -- Guido Günther <agx@sigxcpu.org>  Sun, 28 Dec 2014 15:04:26 +0100
+
 whatmaps (0.0.8-5) unstable; urgency=medium
 
   * [617fed4] Add sv Debconf translation.  Thanks to Martin Bagge (Closes:
