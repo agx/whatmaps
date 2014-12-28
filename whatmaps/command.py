@@ -39,7 +39,7 @@ def check_maps(procs, shared_objects):
                     restart_procs[proc.exe] += [ proc ]
                 else:
                     restart_procs[proc.exe] = [ proc ]
-                continue
+                break
     return restart_procs
 
 
@@ -59,7 +59,7 @@ def write_cmd_file(services, cmd_file, distro):
     out = open(cmd_file, 'w')
     print('#! /bin/sh', file=out)
     for service in services:
-        logging.debug("Need to restart %s", service)
+        logging.info("Need to restart '%s'", service)
         print(" ".join(distro.restart_service_cmd(service)), file=out)
     out.close()
     os.chmod(cmd_file, 0o755)
@@ -113,7 +113,12 @@ def find_systemd_units(procmap, distro):
 
     for dummy, procs in procmap.items():
         for proc in procs:
-            unit = Systemd.process_to_unit(proc)
+            try:
+                unit = Systemd.process_to_unit(proc)
+            except ValueError as e:
+                logging.warning("No systemd unit found for '%s': %s"
+                                "- restart manually" % (proc.exe, e))
+                continue
             if not unit:
                 logging.warning("No systemd unit found for '%s'"
                                 "- restart manually" % proc.exe)
@@ -225,7 +230,7 @@ def main(argv):
             write_cmd_file(services, options.print_cmds, distro)
         else:
             for service in services:
-                logging.info("Restarting %s" % service)
+                logging.info("Restarting '%s'" % service)
                 distro.restart_service(service)
     elif services:
         print("Services that possibly need to be restarted:")

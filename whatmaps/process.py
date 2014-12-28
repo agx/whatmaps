@@ -36,7 +36,7 @@ class Process(object):
             if m:
                 self.exe = m.group('exe')
                 self.deleted = True
-                logging.info("Using deleted exe %s", self.exe)
+                logging.debug("Using deleted exe %s", self.exe)
             if not os.path.exists(self.exe):
                 logging.debug("%s doesn't exist", self.exe)
             self.cmdline = open(self._procpath('%d/cmdline' % self.pid)).read()

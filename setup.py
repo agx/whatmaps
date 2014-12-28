@@ -21,7 +21,8 @@ data_files = []
 
 try:
     import lsb_release
-    if lsb_release.get_distro_information()['ID'] in [ 'Debian' ]:
+    if (lsb_release.get_distro_information()['ID'] in [ 'Debian' ] or
+        os.path.exists('/etc/debian_version')):
        data_files = [('../etc/apt/apt.conf.d/',
                       ['apt/50whatmaps_apt']),
                      ('../etc/apt/apt.conf.d/',
