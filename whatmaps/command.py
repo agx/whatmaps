@@ -59,7 +59,7 @@ def write_cmd_file(services, cmd_file, distro):
     out = open(cmd_file, 'w')
     print('#! /bin/sh', file=out)
     for service in services:
-        logging.debug("Need to restart %s", service)
+        logging.info("Need to restart '%s'", service)
         print(" ".join(distro.restart_service_cmd(service)), file=out)
     out.close()
     os.chmod(cmd_file, 0o755)
@@ -225,7 +225,7 @@ def main(argv):
             write_cmd_file(services, options.print_cmds, distro)
         else:
             for service in services:
-                logging.info("Restarting %s" % service)
+                logging.info("Restarting '%s'" % service)
                 distro.restart_service(service)
     elif services:
         print("Services that possibly need to be restarted:")
