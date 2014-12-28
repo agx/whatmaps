@@ -38,4 +38,10 @@ class Systemd(object):
         if systemctl_status.returncode:
             return None
         else:
-            return output.split()[0]
+            parts = output.split()
+            if parts[0].endswith('.service'):
+                return parts[0]
+            elif parts[1].endswith('.service'):
+                return parts[1]
+            else:
+                raise ValueError("Can't parse service name from\n%s" % output)
