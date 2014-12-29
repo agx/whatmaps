@@ -47,9 +47,10 @@ class DebianDistro(Distro):
                       'dovecot-pop3d':       [ 'dovecot' ],
                       'exim4-daemon-light':  [ 'exim4' ],
                       'exim4-daemon-heavy':  [ 'exim4' ],
-                      'qemu-system-x86_64':  [ 'libvirt-guests' ],
+                      'libvirt-daemon':      [ 'libvirtd' ],
                       'openjdk-6-jre-headless': ['jenkins', 'tomcat7'],
                       'openjdk-7-jre-headless': ['jenkins', 'tomcat7'],
+                      'qemu-system-x86_64':  [ 'libvirt-guests' ],
                     }
 
     # Per package blacklist
