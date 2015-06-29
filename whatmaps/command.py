@@ -81,7 +81,8 @@ def find_pkgs(procs, distro):
                 pkg.procs = [ proc ]
                 pkgs[pkg.name] = pkg
 
-    logging.info("Packages that ship the affected binaries:")
+    if pkgs:
+        logging.info("Packages that ship the affected binaries:")
     for pkg in pkgs.values():
         logging.info("  Pkg: %s, binaries: %s" % (pkg.name, pkg.procs))
 

@@ -36,10 +36,10 @@ class TestDistro(unittest.TestCase):
         self.assertEqual(Distro.service_blacklist, set())
         self.assertIsNone(Distro.id)
         # Pure virtual methods
-        self.assertRaises(Distro.pkg, None, None, NotImplementedError)
-        self.assertRaises(Distro.pkg_by_file, None, NotImplementedError)
-        self.assertRaises(Distro.restart_service_cmd, None, NotImplementedError)
-        self.assertRaises(Distro.restart_service, None, NotImplementedError)
+        self.assertRaises(NotImplementedError, Distro.pkg, None)
+        self.assertRaises(NotImplementedError, Distro.pkg_by_file, None)
+        self.assertRaises(NotImplementedError, Distro.restart_service_cmd, None)
+        self.assertRaises(NotImplementedError, Distro.restart_service, None)
         # Lookup methods
         self.assertEqual(Distro.pkg_services(Pkg), [])
         self.assertEqual(Distro.pkg_service_blacklist(Pkg), [])
