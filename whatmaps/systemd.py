@@ -1,6 +1,6 @@
 # vim: set fileencoding=utf-8 :
 #
-# (C) 2014 Guido Günther <agx@sigxcpu.org>
+# (C) 2014,2015 Guido Günther <agx@sigxcpu.org>
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
 #   the Free Software Foundation, either version 3 of the License, or
@@ -44,4 +44,4 @@ class Systemd(object):
             elif parts[1].endswith('.service'):
                 return parts[1]
             else:
-                raise ValueError("Can't parse service name from\n%s" % output)
+                raise ValueError("Can't parse service name from: (%s %s)" % (parts[0], parts[1]))
