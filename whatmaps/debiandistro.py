@@ -43,6 +43,7 @@ class DebianDistro(Distro):
     _pkg_services = { 'apache2-mpm-worker':  [ 'apache2' ],
                       'apache2-mpm-prefork': [ 'apache2' ],
                       'apache2.2-bin':       [ 'apache2' ],
+                      'apache2-bin':         [ 'apache2' ],
                       'dovecot-imapd':       [ 'dovecot' ],
                       'dovecot-pop3d':       [ 'dovecot' ],
                       'exim4-daemon-light':  [ 'exim4' ],
