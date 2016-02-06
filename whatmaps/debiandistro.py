@@ -166,7 +166,7 @@ class DebianDistro(Distro):
         security_update_origins = klass._security_update_origins()
         security_updates = {}
 
-        for pkg in pkgs.values():
+        for pkg in list(pkgs.values()):
             cache_pkg = cache[pkg.name]
             for cache_version in cache_pkg.version_list:
                 if pkg.version == cache_version.ver_str:
