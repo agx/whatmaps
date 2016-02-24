@@ -47,7 +47,7 @@ class TestSystemd(unittest.TestCase):
    CGroup: name=systemd:/system/libvirt-bin.service
            ├─ 952 /usr/sbin/libvirtd
            └─1355 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf
-    """
+    """.encode('utf-8')
         with patch('os.path.exists', return_value=True):
             with patch('subprocess.Popen') as mock:
                 PopenMock = mock.return_value
