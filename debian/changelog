@@ -1,3 +1,15 @@
+whatmaps (0.0.11~git0.4e704c-1) experimental; urgency=medium
+
+  [ Santiago Garcia Mantinan ]
+  * [1b59d85] Respect jessie apache package rename (Closes: #791569)
+
+  [ Guido Günther ]
+  * Upload to experimental
+  * New upstream snapshot with python3 support
+  * [da0a930] Switch packaging to python3
+
+ -- Guido Günther <agx@sigxcpu.org>  Wed, 24 Feb 2016 20:04:15 +0100
+
 whatmaps (0.0.10-1) unstable; urgency=medium
 
   * New upstream version 0.0.10:
