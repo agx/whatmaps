@@ -38,7 +38,7 @@ class Systemd(object):
         if systemctl_status.returncode:
             return None
         else:
-            parts = output.split()
+            parts = output.decode('utf-8').split()
             if parts[0].endswith('.service'):
                 return parts[0]
             elif parts[1].endswith('.service'):

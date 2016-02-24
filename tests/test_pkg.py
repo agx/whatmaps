@@ -40,8 +40,8 @@ class TestPkg(unittest.TestCase):
             p._list_contents = '/does/not/matter'
             PopenMock = mock.return_value
             PopenMock.communicate.return_value = [
-                '/package/content',
-                '/more/package/content',
+                b'/package/content',
+                b'/more/package/content',
             ]
             PopenMock.returncode = 0
             result = p._get_contents()
@@ -62,11 +62,11 @@ class TestPkg(unittest.TestCase):
             p = Pkg('doesnotmatter')
             p._list_contents = '/does/not/matter'
             PopenMock = mock.return_value
-            PopenMock.communicate.return_value = ['\n'.join([
-                '/lib/foo.so.1',
-                '/lib/bar.so',
-                '/not/a/shared/object',
-                '/not/a/shared/object.soeither',
+            PopenMock.communicate.return_value = [b'\n'.join([
+                b'/lib/foo.so.1',
+                b'/lib/bar.so',
+                b'/not/a/shared/object',
+                b'/not/a/shared/object.soeither',
             ])]
             PopenMock.returncode = 0
             result = p.shared_objects

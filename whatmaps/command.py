@@ -1,4 +1,4 @@
-#!/usr/bin/python -u
+#!/usr/bin/python3 -u
 # vim: set fileencoding=utf-8 :
 #
 # (C) 2010,2014 Guido Günther <agx@sigxcpu.org>
@@ -16,7 +16,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from __future__ import print_function
+
 
 import errno
 import glob
@@ -83,7 +83,7 @@ def find_pkgs(procs, distro):
 
     if pkgs:
         logging.info("Packages that ship the affected binaries:")
-    for pkg in pkgs.values():
+    for pkg in list(pkgs.values()):
         logging.info("  Pkg: %s, binaries: %s" % (pkg.name, pkg.procs))
 
     return pkgs
@@ -96,7 +96,7 @@ def find_services(pkgs, distro):
     """
     all_services = set()
 
-    for pkg in pkgs.values():
+    for pkg in list(pkgs.values()):
         services = set(pkg.services + distro.pkg_services(pkg))
         services -= set(distro.pkg_service_blacklist(pkg))
         if not services:
@@ -112,7 +112,7 @@ def find_systemd_units(procmap, distro):
     """Find systemd units that contain the given processes"""
     units = set()
 
-    for dummy, procs in procmap.items():
+    for dummy, procs in list(procmap.items()):
         for proc in procs:
             try:
                 unit = Systemd.process_to_unit(proc)
@@ -201,7 +201,7 @@ def main(argv):
         else:
             raise
     logging.debug("Processes that map them:")
-    for exe, pids in restart_procs.items():
+    for exe, pids in list(restart_procs.items()):
         logging.debug("  Exe: %s Pids: %s", exe, pids),
 
     if Systemd.is_running():

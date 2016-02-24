@@ -63,7 +63,7 @@ class Pkg(object):
         output = list_contents.communicate()[0]
         if list_contents.returncode:
             raise PkgError("Failed to list package contents for '%s'" % self.name)
-        self._contents = output.split('\n')
+        self._contents = output.decode('utf-8').split('\n')
         return self._contents
 
     @property
