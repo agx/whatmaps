@@ -43,5 +43,8 @@ class Systemd(object):
                 return parts[0]
             elif parts[1].endswith('.service'):
                 return parts[1]
+            elif parts[1].startswith('session-') and parts[1].endswith('.scope'):
+                msg = output.decode('utf-8').split('\n')[0][2:]
+                raise ValueError("Can't parse service name from %s" % msg)
             else:
                 raise ValueError("Can't parse service name from: (%s %s)" % (parts[0], parts[1]))

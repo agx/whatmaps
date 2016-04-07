@@ -60,3 +60,23 @@ class TestSystemd(unittest.TestCase):
                 result = Systemd().process_to_unit(p)
                 self.assertIsNone(result)
 
+    def test_process_user_session(self):
+        p = Process(952)
+        output = """● session-8762.scope - Session 8762 of user root
+   Loaded: loaded
+   Drop-In: /run/systemd/system/session-8762.scope.d
+            └─50-After-systemd-logind\x2eservice.conf, 50-After-systemd-user-sessions\x2eservice.conf, 50-Description.conf, 50-SendSIGHUP.conf, 50-Slice.conf
+    Active: active (running) since Thu 2016-04-07 20:53:52 CEST; 19min ago
+    CGroup: /user.slice/user-0.slice/session-8762.scope
+            ├─21150 sshd: root@pts/0
+            ├─21155 -bash
+            ├─23956 /usr/bin/python /usr/bin/whatmaps --debug libc6
+            └─23962 systemctl status 21155
+    """.encode('utf-8')
+        with patch('os.path.exists', return_value=True):
+            with patch('subprocess.Popen') as mock:
+                PopenMock = mock.return_value
+                PopenMock.communicate.return_value = [output]
+                PopenMock.returncode = 0
+                with self.assertRaisesRegexp(ValueError, "Can't parse service name from session-8762.scope - Session 8762 of user root"):
+                    Systemd().process_to_unit(p)
