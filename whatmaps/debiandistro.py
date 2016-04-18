@@ -165,9 +165,14 @@ class DebianDistro(Distro):
 
         security_update_origins = klass._security_update_origins()
         security_updates = {}
+        notfound = []
 
         for pkg in list(pkgs.values()):
-            cache_pkg = cache[pkg.name]
+            try:
+                cache_pkg = cache[pkg.name]
+            except KeyError:
+                notfound.append(pkg)
+                continue
             for cache_version in cache_pkg.version_list:
                 if pkg.version == cache_version.ver_str:
                     for pfile, _ in cache_version.file_list:
@@ -176,4 +181,4 @@ class DebianDistro(Distro):
                                pfile.archive == origin[1]:
                                 security_updates[pkg] = pkg
                                 break
-        return security_updates
+        return (security_updates, notfound)

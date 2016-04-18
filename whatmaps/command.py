@@ -174,7 +174,9 @@ def main(argv):
             return 1
         if not pkgs:
             return 0
-        pkgs = distro.filter_security_updates(pkgs)
+        pkgs, notfound = distro.filter_security_updates(pkgs)
+        if notfound:
+            logging.warning("Pkgs %s not found in apt cache" % ", ".join(notfound))
         logging.debug("Security Upgrades: %s" % pkgs)
     else:
         parser.print_help()
