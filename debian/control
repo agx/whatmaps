@@ -11,7 +11,6 @@ Standards-Version: 3.9.5
 Homepage: https://honk.sigxcpu.org/piki/projects/whatmaps
 Vcs-Git: git://honk.sigxcpu.org/git/whatmaps.git/
 X-Python3-Version: >= 3.4
-XS-Testsuite: autopkgtest
 
 Package: whatmaps
 Architecture: all
