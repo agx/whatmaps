@@ -1,3 +1,5 @@
 #!/bin/sh
 
-whatmaps libvirt0 | grep -qsE '^(libvirt-bin|libvirtd)'
+whatmaps --help
+
+/bin/bash -c 'whatmaps --debug libncurses5 2>&1 | grep bash'
