@@ -158,7 +158,7 @@ def main(argv):
     logging.basicConfig(level=level,
                         format='%(levelname)s: %(message)s')
 
-    distro = Distro.detect()
+    distro = Distro.detect()()
     if not distro:
         logging.error("Unsupported Distribution")
         return 1
