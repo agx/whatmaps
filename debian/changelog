@@ -1,3 +1,25 @@
+whatmaps (0.0.12-1) unstable; urgency=medium
+
+  * New upstream version 0.0.12
+    * [73afbae] systemd: Shorten error message if proess is from a user
+      session.
+    * [0bcd51e] Don't bail out if we can't find a package in apt's cache.
+      Rather warn about it and continue so we get restarts for all other
+      packages.
+    * [9cb7517] Don't abort if we can't parse a package but process the other
+      ones.
+    * [48651cd] Filter out user@<uid>.service since this aborts user sessions
+      otherwise (Closes: #833120)
+  * [59180ff] It's dh_auto_clean not dh_autoclean.
+    Thanks to Chris Lamb (Closes: #834665)
+  * [ead569e] Use a simpler smoke test.
+  * [eeb2ed4] Add nl debconf translation.
+    Thanks to Frans Spiesschaert (Closes: #766529)
+  * [ddb53e0] Drop now superfluous XS-Testsuite
+  * [e9ca457] Bump standards version
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 23 Sep 2016 13:25:26 +0200
+
 whatmaps (0.0.11~git0.4e704c-1) experimental; urgency=medium
 
   [ Santiago Garcia Mantinan ]
