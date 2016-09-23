@@ -29,18 +29,21 @@ projectdir = os.path.dirname(os.path.dirname(os.path.abspath(whatmaps.__file__))
 _chdir_backup = None
 _tmpdirs = []
 
+
 def chdir(dir):
     global _chdir_backup
     if not _chdir_backup:
         _chdir_backup = os.path.abspath(os.curdir)
     os.chdir(str(dir))
 
+
 def new_tmpdir(name):
     global _tmpdirs
-    prefix='whatmaps_%s_' % name
+    prefix = 'whatmaps_%s_' % name
     tmpdir = TmpDir(prefix)
     _tmpdirs.append(tmpdir)
     return tmpdir
+
 
 def teardown():
     if _chdir_backup:
@@ -48,6 +51,7 @@ def teardown():
     for tmpdir in _tmpdirs:
         tmpdir.rmdir()
     del _tmpdirs[:]
+
 
 class TmpDir(object):
 
