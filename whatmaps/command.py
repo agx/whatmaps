@@ -117,11 +117,11 @@ def find_systemd_units(procmap, distro):
             try:
                 unit = Systemd.process_to_unit(proc)
             except ValueError as e:
-                logging.warning("No systemd unit found for '%s': %s"
+                logging.warning("No systemd unit found for '%s': %s "
                                 "- restart manually" % (proc.exe, e))
                 continue
             if not unit:
-                logging.warning("No systemd unit found for '%s'"
+                logging.warning("No systemd unit found for '%s' "
                                 "- restart manually" % proc.exe)
             else:
                 units.add(unit)
