@@ -17,6 +17,7 @@
 
 import logging
 import os
+import re
 import subprocess
 
 
@@ -33,6 +34,8 @@ class Distro(object):
     @cvar id: distro id as returned by lsb-release
 
     @cvar service_blacklist: services that should never be restarted
+    @cvar service_blacklist_re: regex list of services that should
+       never be restartet
     @cvar _pkg_services: A C{dict} that maps packages to services. In
       case we find binaries that match a key in this hash restart
       the services listed in values.
@@ -41,6 +44,8 @@ class Distro(object):
     """
     id = None
     service_blacklist = set()
+    service_blacklist_re = set()
+
     _pkg_services = {}
     _pkg_blacklist = {}
     _pkg_service_blacklist = {}
@@ -86,6 +91,17 @@ class Distro(object):
         a binary from this package maps a shared lib that changed.
         """
         return klass._pkg_service_blacklist.get(pkg.name, [])
+
+    def filter_services(self, services):
+        """
+        Filter out servies that match service_blacklist_re
+        """
+        ret = []
+        matchers = [re.compile(b) for b in self.service_blacklist_re]
+        for s in services:
+            if not any([m.match(s) for m in matchers]):
+                ret.append(s)
+        return set(ret)
 
     @classmethod
     def has_apt(klass):

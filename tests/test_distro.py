@@ -54,3 +54,20 @@ class TestDistro(unittest.TestCase):
             with patch('os.path.exists', return_value=False):
                 d = detect()
                 self.assertEqual(d.id, 'Debian')
+
+    def test_filter_services_empty(self):
+        d = Distro()
+        self.assertEqual(set(['foo', 'bar']),
+                         d.filter_services(['foo', 'bar']))
+
+    def test_filter_services_one(self):
+        d = Distro()
+        d.service_blacklist_re = ['^f..']
+        self.assertEqual(set(['bar']),
+                         d.filter_services(['foo', 'bar']))
+
+    def test_filter_services_all(self):
+        d = Distro()
+        d.service_blacklist_re = ['^f..', '^b..']
+        self.assertEqual(set(),
+                         d.filter_services(['foo', 'bar']))

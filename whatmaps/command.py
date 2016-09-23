@@ -129,6 +129,16 @@ def find_systemd_units(procmap, distro):
     return units
 
 
+def filter_services(distro, services):
+    filtered = distro.filter_services(services)
+    diff = services - filtered
+    if len(diff):
+        logging.warning("Filtered out blacklisted service%s %s - restart manually",
+                        's' if len(diff) > 1 else '',
+                        ', '.join(diff))
+    return filtered
+
+
 def main(argv):
     shared_objects = []
     services = None
@@ -228,6 +238,8 @@ def main(argv):
                 return 1
             else:
                 return 0
+
+    services = filter_services(distro, services)
 
     if options.restart:
         if options.print_cmds and services:
