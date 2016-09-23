@@ -19,17 +19,18 @@ import re
 
 from . pkg import Pkg
 
+
 class DebianPkg(Pkg):
     type = 'Debian'
     _init_script_re = re.compile('/etc/init.d/[\w\-\.]')
-    _list_contents = ['dpkg-query', '-L', '${pkg_name}' ]
+    _list_contents = ['dpkg-query', '-L', '${pkg_name}']
 
     def __init__(self, name):
         Pkg.__init__(self, name)
 
     @property
     def services(self):
-        if self._services != None:
+        if self._services is not None:
             return self._services
 
         self._services = []
@@ -39,4 +40,3 @@ class DebianPkg(Pkg):
             if self._init_script_re.match(line):
                 self._services.append(os.path.basename(line.strip()))
         return self._services
-
