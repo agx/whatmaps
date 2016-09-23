@@ -15,13 +15,13 @@
 """Test L{whatmaps.process} config"""
 
 import os
-import sys
 import unittest
 import random
 
 from whatmaps.process import Process
 
 from . import context
+
 
 class TestWhatmapsProcess(unittest.TestCase):
     def setUp(self):
@@ -33,7 +33,7 @@ class TestWhatmapsProcess(unittest.TestCase):
         self.exe = os.path.join(self.piddir, 'exe')
         self.cmdline = os.path.join(self.piddir, 'cmdline')
         self.maps = os.path.join(self.piddir, 'maps')
-        self._write_cmdline('doesnotmatter') # Write at least an empty cmdline
+        self._write_cmdline('doesnotmatter')  # Write at least an empty cmdline
         self._write_exe_symlink('acommand')
         self._write_maps([['f32b43221000-7f32b4522000',
                            '---p',
@@ -47,7 +47,7 @@ class TestWhatmapsProcess(unittest.TestCase):
                            'fe:02',
                            '1704011',
                            '/lib/x86_64-linux-gnu/libselinux.so.1'],
-                      ])
+                          ])
 
     def _write_exe_symlink(self, name):
         exe = os.path.join(str(self.tmpdir), name)
