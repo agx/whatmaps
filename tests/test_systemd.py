@@ -19,11 +19,12 @@ import unittest
 from mock import patch
 
 from whatmaps.systemd import Systemd
-from whatmaps.process import Process
+
 
 class Process(object):
     def __init__(self, pid):
         self.pid = pid
+
 
 class TestSystemd(unittest.TestCase):
     def test_is_init(self):
