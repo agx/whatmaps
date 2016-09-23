@@ -1,0 +1,52 @@
+# Dutch translation of whatmaps debconf templates.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the whatmaps package.
+# Frans Spiesschaert <Frans.Spiesschaert@yucom.be>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: whatmaps\n"
+"Report-Msgid-Bugs-To: whatmaps@packages.debian.org\n"
+"POT-Creation-Date: 2014-08-20 06:56+0200\n"
+"PO-Revision-Date: 2014-10-09 22:48+0200\n"
+"Last-Translator: Frans Spiesschaert <Frans.Spiesschaert@yucom.be>\n"
+"Language-Team: Debian Dutch l10n Team <debian-l10n-dutch@lists.debian.org>\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid "Automatically restart services after library security updates?"
+msgstr ""
+"De diensten automatisch opnieuw opstarten na de beveiligingsbijwerkingen aan "
+"de bibliotheken?"
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"Services need to be restarted to benefit from updates of shared libraries "
+"they depend on. Otherwise they remain vulnerable to security bugs fixed in "
+"these updates."
+msgstr ""
+"Diensten moeten opnieuw gestart worden om voordeel te halen uit het "
+"bijwerken van gedeelde bibliotheken waarop zij steunen. Anders blijven zij "
+"kwetsbaar voor de veiligheidsproblemen die in die bijwerkingen gerepareerd "
+"werden."
+
+#. Type: boolean
+#. Description
+#: ../templates:2001
+msgid ""
+"Automatic service restarts are only done if APT fetched the library from a "
+"source providing security updates. This also affects packages installed via "
+"\"unattended-upgrades\"."
+msgstr ""
+"Het automatisch opnieuw opstarten van diensten gebeurt enkel indien APT de "
+"bibliotheek ophaalde uit een bron die beveiligingsbijwerkingen aanbiedt. Dit "
+"heeft ook betrekking op pakketten die geïnstalleerd werden via \"unattended-"
+"upgrades\"."
