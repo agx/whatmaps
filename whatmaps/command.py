@@ -132,6 +132,7 @@ def find_systemd_units(procmap, distro):
 def main(argv):
     shared_objects = []
     services = None
+    ret = 0
 
     parser = OptionParser(usage='%prog [options] pkg1 [pkg2 pkg3 pkg4]')
     parser.add_option("--debug", action="store_true", dest="debug",
@@ -187,8 +188,8 @@ def main(argv):
         try:
             shared_objects += pkg.shared_objects
         except PkgError:
-            logging.error("Cannot parse contents of %s" % pkg.name)
-            return 1
+            logging.error("Cannot parse contents of %s - skipping it" % pkg.name)
+            ret = 1
     logging.debug("Found shared objects:")
     for so in shared_objects:
         logging.debug("  %s", so)
@@ -240,7 +241,7 @@ def main(argv):
         for s in services:
             print(s)
 
-    return 0
+    return ret
 
 
 def run():
