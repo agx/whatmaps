@@ -19,15 +19,16 @@ import unittest
 from mock import patch
 
 try:
-    import lsb_release
-    have_lsb_release=True
+    import lsb_release  # noqa: F401
+    have_lsb_release = True
 except ImportError:
-    have_lsb_release=False
-
+    have_lsb_release = False
 from whatmaps.distro import Distro, detect
+
 
 class Pkg(object):
     name = 'doesnotmatter'
+
 
 class TestDistro(unittest.TestCase):
     def test_abstract(self):
@@ -44,7 +45,6 @@ class TestDistro(unittest.TestCase):
         self.assertEqual(Distro.pkg_services(Pkg), [])
         self.assertEqual(Distro.pkg_service_blacklist(Pkg), [])
         self.assertFalse(Distro.has_apt())
-
 
     @unittest.skipUnless(have_lsb_release, "lsb_release not installed")
     def test_detect_via_lsb_release_module(self):
