@@ -25,6 +25,7 @@ try:
 except ImportError:
     lsb_release = None
 
+
 class Distro(object):
     """
     A distribution
@@ -75,8 +76,8 @@ class Distro(object):
         List of services that package pkg needs restarted that aren't part
         of pkg itself
         """
-        return [ s for s in klass._pkg_services.get(pkg.name, [])
-                 if klass.is_service_installed(s) ]
+        return [s for s in klass._pkg_services.get(pkg.name, [])
+                if klass.is_service_installed(s)]
 
     @classmethod
     def pkg_service_blacklist(klass, pkg):
@@ -95,8 +96,9 @@ class Distro(object):
     def detect():
         return detect()
 
-import whatmaps.debiandistro
-import whatmaps.redhatdistro
+import whatmaps.debiandistro  # noqa: E402
+import whatmaps.redhatdistro  # noqa: E402
+
 
 def detect():
     """
@@ -110,11 +112,11 @@ def detect():
     else:
         try:
             lsb_cmd = subprocess.Popen(['lsb_release', '--id', '-s'],
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
             output = lsb_cmd.communicate()[0]
             if not lsb_cmd.returncode:
-               id = output.strip()
+                id = output.strip()
         except OSError:
             # id is None in this case
             pass
