@@ -17,7 +17,6 @@
 #
 
 
-
 import errno
 import glob
 import os
@@ -30,15 +29,16 @@ from . distro import Distro
 from . pkg import PkgError
 from . systemd import Systemd
 
+
 def check_maps(procs, shared_objects):
     restart_procs = {}
     for proc in procs:
         for so in shared_objects:
             if proc.maps(so):
                 if proc.exe in restart_procs:
-                    restart_procs[proc.exe] += [ proc ]
+                    restart_procs[proc.exe] += [proc]
                 else:
-                    restart_procs[proc.exe] = [ proc ]
+                    restart_procs[proc.exe] = [proc]
                 break
     return restart_procs
 
@@ -78,7 +78,7 @@ def find_pkgs(procs, distro):
             if pkg.name in pkgs:
                 pkgs[pkg.name].procs.append(proc)
             else:
-                pkg.procs = [ proc ]
+                pkg.procs = [proc]
                 pkgs[pkg.name] = pkg
 
     if pkgs:
@@ -125,7 +125,7 @@ def find_systemd_units(procmap, distro):
                                 "- restart manually" % proc.exe)
             else:
                 units.add(unit)
-    units -= set([ service + '.service' for service in distro.service_blacklist ])
+    units -= set([service + '.service' for service in distro.service_blacklist])
     return units
 
 
@@ -165,7 +165,7 @@ def main(argv):
         logging.debug("Detected distribution: '%s'", distro.id)
 
     if args:
-        pkgs = [ distro.pkg(arg) for arg in args ]
+        pkgs = [distro.pkg(arg) for arg in args]
     elif options.apt and distro.has_apt():
         try:
             pkgs = distro.read_apt_pipeline()
@@ -241,6 +241,7 @@ def main(argv):
             print(s)
 
     return 0
+
 
 def run():
     return(main(sys.argv))
