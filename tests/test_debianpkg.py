@@ -20,10 +20,10 @@ from mock import patch
 
 from whatmaps.debianpkg import DebianPkg
 
+
 class TestDebianPkg(unittest.TestCase):
     def test_services(self):
         with patch('whatmaps.pkg.Pkg._get_contents') as mock:
             mock.return_value = ['/etc/init.d/aservice', '/usr/bin/afile']
             p = DebianPkg('doesnotmatter')
             self.assertEqual(p.services, ['aservice'])
-

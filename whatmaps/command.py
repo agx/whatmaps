@@ -17,7 +17,6 @@
 #
 
 
-
 import errno
 import glob
 import os
@@ -30,15 +29,16 @@ from . distro import Distro
 from . pkg import PkgError
 from . systemd import Systemd
 
+
 def check_maps(procs, shared_objects):
     restart_procs = {}
     for proc in procs:
         for so in shared_objects:
             if proc.maps(so):
                 if proc.exe in restart_procs:
-                    restart_procs[proc.exe] += [ proc ]
+                    restart_procs[proc.exe] += [proc]
                 else:
-                    restart_procs[proc.exe] = [ proc ]
+                    restart_procs[proc.exe] = [proc]
                 break
     return restart_procs
 
@@ -78,7 +78,7 @@ def find_pkgs(procs, distro):
             if pkg.name in pkgs:
                 pkgs[pkg.name].procs.append(proc)
             else:
-                pkg.procs = [ proc ]
+                pkg.procs = [proc]
                 pkgs[pkg.name] = pkg
 
     if pkgs:
@@ -117,21 +117,32 @@ def find_systemd_units(procmap, distro):
             try:
                 unit = Systemd.process_to_unit(proc)
             except ValueError as e:
-                logging.warning("No systemd unit found for '%s': %s"
+                logging.warning("No systemd unit found for '%s': %s "
                                 "- restart manually" % (proc.exe, e))
                 continue
             if not unit:
-                logging.warning("No systemd unit found for '%s'"
+                logging.warning("No systemd unit found for '%s' "
                                 "- restart manually" % proc.exe)
             else:
                 units.add(unit)
-    units -= set([ service + '.service' for service in distro.service_blacklist ])
+    units -= set([service + '.service' for service in distro.service_blacklist])
     return units
+
+
+def filter_services(distro, services):
+    filtered = distro.filter_services(services)
+    diff = services - filtered
+    if len(diff):
+        logging.warning("Filtered out blacklisted service%s %s - restart manually",
+                        's' if len(diff) > 1 else '',
+                        ', '.join(diff))
+    return filtered
 
 
 def main(argv):
     shared_objects = []
     services = None
+    ret = 0
 
     parser = OptionParser(usage='%prog [options] pkg1 [pkg2 pkg3 pkg4]')
     parser.add_option("--debug", action="store_true", dest="debug",
@@ -157,7 +168,7 @@ def main(argv):
     logging.basicConfig(level=level,
                         format='%(levelname)s: %(message)s')
 
-    distro = Distro.detect()
+    distro = Distro.detect()()
     if not distro:
         logging.error("Unsupported Distribution")
         return 1
@@ -165,7 +176,7 @@ def main(argv):
         logging.debug("Detected distribution: '%s'", distro.id)
 
     if args:
-        pkgs = [ distro.pkg(arg) for arg in args ]
+        pkgs = [distro.pkg(arg) for arg in args]
     elif options.apt and distro.has_apt():
         try:
             pkgs = distro.read_apt_pipeline()
@@ -174,7 +185,9 @@ def main(argv):
             return 1
         if not pkgs:
             return 0
-        pkgs = distro.filter_security_updates(pkgs)
+        pkgs, notfound = distro.filter_security_updates(pkgs)
+        if notfound:
+            logging.warning("Pkgs %s not found in apt cache" % ", ".join(notfound))
         logging.debug("Security Upgrades: %s" % pkgs)
     else:
         parser.print_help()
@@ -185,8 +198,8 @@ def main(argv):
         try:
             shared_objects += pkg.shared_objects
         except PkgError:
-            logging.error("Cannot parse contents of %s" % pkg.name)
-            return 1
+            logging.error("Cannot parse contents of %s - skipping it" % pkg.name)
+            ret = 1
     logging.debug("Found shared objects:")
     for so in shared_objects:
         logging.debug("  %s", so)
@@ -226,6 +239,8 @@ def main(argv):
             else:
                 return 0
 
+    services = filter_services(distro, services)
+
     if options.restart:
         if options.print_cmds and services:
             write_cmd_file(services, options.print_cmds, distro)
@@ -238,7 +253,8 @@ def main(argv):
         for s in services:
             print(s)
 
-    return 0
+    return ret
+
 
 def run():
     return(main(sys.argv))

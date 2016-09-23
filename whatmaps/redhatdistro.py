@@ -21,10 +21,11 @@ import subprocess
 from . distro import Distro
 from . rpmpkg import RpmPkg
 
+
 class RedHatDistro(Distro):
     "RPM based distribution"""
     _pkg_re = re.compile(r'(?P<pkg>[\w\-\+]+)-(?P<ver>[\w\.]+)'
-                          '-(?P<rel>[\w\.]+)\.(?P<arch>.+)')
+                         '-(?P<rel>[\w\.]+)\.(?P<arch>.+)')
 
     @classmethod
     def pkg(klass, name):
@@ -33,8 +34,8 @@ class RedHatDistro(Distro):
     @classmethod
     def pkg_by_file(klass, path):
         find_file = subprocess.Popen(['rpm', '-qf', path],
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.PIPE)
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE)
         output = find_file.communicate()[0]
         if find_file.returncode:
             return None
@@ -52,4 +53,3 @@ class RedHatDistro(Distro):
 
 class FedoraDistro(RedHatDistro):
     id = 'Fedora'
-

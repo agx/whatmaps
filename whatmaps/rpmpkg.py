@@ -19,17 +19,18 @@ import re
 
 from . pkg import Pkg
 
+
 class RpmPkg(Pkg):
     type = 'RPM'
     _init_script_re = re.compile('/etc/rc.d/init.d/[\w\-\.]')
-    _list_contents = [ 'rpm', '-ql', '$pkg_name' ]
+    _list_contents = ['rpm', '-ql', '$pkg_name']
 
     def __init__(self, name):
         Pkg.__init__(self, name)
 
     @property
     def services(self):
-        if self._services != None:
+        if self._services is not None:
             return self._services
 
         self._services = []

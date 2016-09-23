@@ -20,6 +20,7 @@ from mock import patch
 from whatmaps.redhatdistro import RedHatDistro
 from whatmaps.rpmpkg import RpmPkg
 
+
 class TestRedHatDistro(unittest.TestCase):
     def test_vars(self):
         """Check RedHat distro vars"""

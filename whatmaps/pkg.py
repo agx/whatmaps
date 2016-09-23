@@ -19,6 +19,7 @@ import re
 import string
 import subprocess
 
+
 class PkgError(Exception):
     pass
 
@@ -55,8 +56,8 @@ class Pkg(object):
         if self._contents:
             return self._contents
         else:
-            cmd = [ string.Template(arg).substitute(arg, pkg_name=self.name)
-                    for arg in self._list_contents ]
+            cmd = [string.Template(arg).substitute(arg, pkg_name=self.name)
+                   for arg in self._list_contents]
             list_contents = subprocess.Popen(cmd,
                                              stdout=subprocess.PIPE,
                                              stderr=subprocess.PIPE)

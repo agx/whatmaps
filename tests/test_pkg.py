@@ -15,11 +15,12 @@
 """Test L{whatmaps.process} config"""
 
 import unittest
-from  mock import patch
+from mock import patch
 
 from whatmaps.pkg import Pkg, PkgError
 
 from . import context
+
 
 class TestPkg(unittest.TestCase):
     def setUp(self):

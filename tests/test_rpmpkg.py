@@ -20,6 +20,7 @@ from mock import patch
 
 from whatmaps.rpmpkg import RpmPkg
 
+
 class TestRpmPkg(unittest.TestCase):
     def test_services(self):
         with patch('whatmaps.pkg.Pkg._get_contents') as mock:

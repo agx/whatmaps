@@ -20,6 +20,7 @@ import logging
 import os
 import re
 
+
 class Process(object):
     """A process - Linux only so far, needs /proc mounted"""
     deleted_re = re.compile(r"(?P<exe>.*) \(deleted\)$")

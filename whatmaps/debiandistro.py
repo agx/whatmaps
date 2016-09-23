@@ -36,29 +36,36 @@ from . debianpkg import DebianPkg
 from . pkg import PkgError
 from . systemd import Systemd
 
+
 class DebianDistro(Distro):
     "Debian (dpkg) based distribution"
     id = 'Debian'
 
-    _pkg_services = { 'apache2-mpm-worker':  [ 'apache2' ],
-                      'apache2-mpm-prefork': [ 'apache2' ],
-                      'apache2.2-bin':       [ 'apache2' ],
-                      'apache2-bin':         [ 'apache2' ],
-                      'dovecot-imapd':       [ 'dovecot' ],
-                      'dovecot-pop3d':       [ 'dovecot' ],
-                      'exim4-daemon-light':  [ 'exim4' ],
-                      'exim4-daemon-heavy':  [ 'exim4' ],
-                      'libvirt-daemon':      [ 'libvirtd' ],
-                      'openjdk-6-jre-headless': ['jenkins', 'tomcat7'],
-                      'openjdk-7-jre-headless': ['jenkins', 'tomcat7'],
-                      'qemu-system-x86_64':  [ 'libvirt-guests' ],
-                    }
+    _pkg_services = {
+        'apache2-mpm-worker': ['apache2'],
+        'apache2-mpm-prefork': ['apache2'],
+        'apache2.2-bin': ['apache2'],
+        'apache2-bin': ['apache2'],
+        'dovecot-imapd': ['dovecot'],
+        'dovecot-pop3d': ['dovecot'],
+        'exim4-daemon-light': ['exim4'],
+        'exim4-daemon-heavy': ['exim4'],
+        'libvirt-daemon': ['libvirtd'],
+        'openjdk-6-jre-headless': ['jenkins', 'tomcat7'],
+        'openjdk-7-jre-headless': ['jenkins', 'tomcat7'],
+        'qemu-system-x86_64': ['libvirt-guests'],
+    }
 
     # Per package blacklist
-    _pkg_service_blacklist = { 'libvirt-bin': [ 'libvirt-guests' ] }
+    _pkg_service_blacklist = {'libvirt-bin': ['libvirt-guests']}
 
     # Per distro blacklist
     service_blacklist = set(['kvm', 'qemu-kvm', 'qemu-system-x86'])
+
+    # Per distro regex filter
+    service_blacklist_re = set([
+        '^user@[0-9]+.service$',  # Restarting systemd user service aborts the session
+    ])
 
     @classmethod
     def pkg(klass, name):
@@ -67,8 +74,8 @@ class DebianDistro(Distro):
     @classmethod
     def pkg_by_file(klass, path):
         find_file = subprocess.Popen(['dpkg-query', '-S', path],
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.PIPE)
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE)
         output = find_file.communicate()[0]
         if find_file.returncode:
             return None
@@ -124,11 +131,10 @@ class DebianDistro(Distro):
             (pkgname, oldversion, compare, newversion, filename) = line.split()
 
             if filename == '**CONFIGURE**':
-                if oldversion != '-': # Updates only
+                if oldversion != '-':  # Updates only
                     pkgs[pkgname] = DebianPkg(pkgname)
                     pkgs[pkgname].version = newversion
         return pkgs
-
 
     @classmethod
     def _security_update_origins(klass):
@@ -138,9 +144,10 @@ class DebianDistro(Distro):
             raise PkgError("lsb_release not found, can't determine security updates")
 
         codename = lsb_release.get_distro_information()['CODENAME']
+
         def _subst(line):
-            mapping = {'distro_codename' : codename,
-                       'distro_id' : klass.id, }
+            mapping = {'distro_codename': codename,
+                       'distro_id': klass.id, }
             return string.Template(line).substitute(mapping)
 
         origins = []
@@ -151,7 +158,6 @@ class DebianDistro(Distro):
         logging.debug("Security Update Origins: %s", origins)
         return origins
 
-
     @classmethod
     def filter_security_updates(klass, pkgs):
         """Filter on security updates"""
@@ -160,14 +166,19 @@ class DebianDistro(Distro):
             raise PkgError("apt_pkg not installed, can't determine security updates")
 
         apt_pkg.init()
-        acquire = apt_pkg.Acquire()
+        apt_pkg.Acquire()
         cache = apt_pkg.Cache()
 
         security_update_origins = klass._security_update_origins()
         security_updates = {}
+        notfound = []
 
         for pkg in list(pkgs.values()):
-            cache_pkg = cache[pkg.name]
+            try:
+                cache_pkg = cache[pkg.name]
+            except KeyError:
+                notfound.append(pkg)
+                continue
             for cache_version in cache_pkg.version_list:
                 if pkg.version == cache_version.ver_str:
                     for pfile, _ in cache_version.file_list:
@@ -176,4 +187,4 @@ class DebianDistro(Distro):
                                pfile.archive == origin[1]:
                                 security_updates[pkg] = pkg
                                 break
-        return security_updates
+        return (security_updates, notfound)
