@@ -62,6 +62,11 @@ class DebianDistro(Distro):
     # Per distro blacklist
     service_blacklist = set(['kvm', 'qemu-kvm', 'qemu-system-x86'])
 
+    # Per distro regex filter
+    service_blacklist_re = set([
+        '^user@[0-9]+.service$',  # Restarting systemd user service aborts the session
+    ])
+
     @classmethod
     def pkg(klass, name):
         return DebianPkg(name)
