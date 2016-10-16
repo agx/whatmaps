@@ -1,3 +1,9 @@
+whatmaps (0.0.12-2) unstable; urgency=medium
+
+  * [affd69d] Simplify smoke test
+
+ -- Guido Günther <agx@sigxcpu.org>  Sun, 16 Oct 2016 16:16:04 +0200
+
 whatmaps (0.0.12-1) unstable; urgency=medium
 
   * New upstream version 0.0.12
