@@ -1,5 +1,6 @@
 #!/bin/sh
 
-whatmaps --help
+set -e
 
-/bin/bash -c 'whatmaps --debug libncurses5 2>&1 | grep bash'
+whatmaps --help
+whatmaps whatmaps

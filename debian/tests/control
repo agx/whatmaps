@@ -1,3 +1,2 @@
 Tests: smoke
-Restrictions: needs-root
 Depends: @
