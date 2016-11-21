@@ -63,8 +63,9 @@ class DebianDistro(Distro):
     service_blacklist = set(['kvm', 'qemu-kvm', 'qemu-system-x86'])
 
     # Per distro regex filter
-    service_blacklist_re = set([
-        '^user@[0-9]+.service$',  # Restarting systemd user service aborts the session
+    service_blacklist_re = set([  # Restarting these aborts the users session
+        '^user@[0-9]+.service$',
+        "^(g|k|light|no|sd|w|x)dm(.service)?$",
     ])
 
     @classmethod
