@@ -64,7 +64,8 @@ class DebianDistro(Distro):
 
     # Per distro regex filter
     service_blacklist_re = set([  # Restarting these aborts the users session
-        '^user@[0-9]+.service$',
+        "^dbus(.service)?$",
+        "^user@[0-9]+.service$",
         "^systemd-logind.service$",
         "^(g|k|light|no|sd|w|x)dm(.service)?$",
     ])
