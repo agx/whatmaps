@@ -112,6 +112,7 @@ class Distro(object):
     def detect():
         return detect()
 
+
 import whatmaps.debiandistro  # noqa: E402
 import whatmaps.redhatdistro  # noqa: E402
 
