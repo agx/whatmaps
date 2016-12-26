@@ -197,8 +197,8 @@ def main(argv):
     for pkg in pkgs:
         try:
             shared_objects += pkg.shared_objects
-        except PkgError:
-            logging.error("Cannot parse contents of %s - skipping it" % pkg.name)
+        except PkgError as e:
+            logging.error("%s - skipping package %s" % (e, pkg.name))
             ret = 1
     logging.debug("Found shared objects:")
     for so in shared_objects:
