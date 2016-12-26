@@ -26,7 +26,7 @@ prompting and with the I<--prind-cmds> option the restart commands are written t
 a file for later execution.
 
 On Debian systems B<whatmaps> can also be run automatically by apt-get. See
-L</usr/share/doc/whatmaps/README.Debian> for details.
+L<//usr/share/doc/whatmaps/README> for details.
 
 =head1 SEE ALSO
 
