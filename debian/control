@@ -9,7 +9,7 @@ Build-Depends: debhelper (>= 9~), lsb-release,
   python3-setuptools,
 Standards-Version: 3.9.8
 Homepage: https://honk.sigxcpu.org/piki/projects/whatmaps
-Vcs-Git: git://honk.sigxcpu.org/git/whatmaps.git/
+Vcs-Git: https://git.sigxcpu.org/cgit/whatmaps/
 X-Python3-Version: >= 3.4
 
 Package: whatmaps
