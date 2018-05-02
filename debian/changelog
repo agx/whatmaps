@@ -1,3 +1,12 @@
+whatmaps (0.0.12-3) unstable; urgency=medium
+
+  * [f2095d5] Fix vcs-git url
+  * [eeaefc0] Build-depend on dh-python (Closes: #896742)
+  * [ddb6eda] Bump standards version to 4.1.4
+  * [c12ed6b] gbp.conf: set id-length to have git commit ids in the changelog
+
+ -- Guido Günther <agx@sigxcpu.org>  Wed, 02 May 2018 09:42:16 +0200
+
 whatmaps (0.0.12-2) unstable; urgency=medium
 
   * [affd69d] Simplify smoke test
