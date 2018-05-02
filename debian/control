@@ -2,7 +2,10 @@ Source: whatmaps
 Section: admin
 Priority: extra
 Maintainer: Guido Günther <agx@sigxcpu.org>
-Build-Depends: debhelper (>= 9~), lsb-release,
+Build-Depends:
+  debhelper (>= 9~),
+  dh-python,
+  lsb-release,
   python3,
   python3-mock,
   python3-nose,
