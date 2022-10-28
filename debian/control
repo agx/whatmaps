@@ -1,6 +1,6 @@
 Source: whatmaps
 Section: admin
-Priority: extra
+Priority: optional
 Maintainer: Guido Günther <agx@sigxcpu.org>
 Build-Depends:
   debhelper-compat (= 13),
