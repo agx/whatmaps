@@ -13,7 +13,6 @@ Build-Depends:
 Standards-Version: 4.1.4
 Homepage: https://honk.sigxcpu.org/piki/projects/whatmaps
 Vcs-Git: https://git.sigxcpu.org/cgit/whatmaps/
-X-Python3-Version: >= 3.4
 
 Package: whatmaps
 Architecture: all
