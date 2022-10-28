@@ -12,10 +12,17 @@ case "$1" in
         db_get whatmaps/enable_service_restarts || true
         DBVAL="$RET"
 
-        # Configuration file doesn't exist but user wants updates enabled so
-        # recreate it:
-        if [ ! -f $APT_CONF ] && [ $DBVAL = "true" ]; then
-            cat << EOF > $APT_CONF
+        if [ -f $APT_CONF ]; then
+            case $DBVAL in
+                "true") VAL=1;;
+                     *) VAL=0;;
+            esac
+            sed -i -e "s,^\(\s*Whatmaps::Enable-Restart\s\+\"\)\S\+\(\"\s*;\),\1${VAL}\2," $APT_CONF
+        else
+            # Configuration file doesn't exist but user wants updates enabled so
+            # recreate it:
+            if [ $DBVAL = "true" ]; then
+                cat << EOF > $APT_CONF
 // Set to 1 or true to enable service restarts on security updates
 Whatmaps::Enable-Restart "1";
 
@@ -25,12 +32,7 @@ Whatmaps::Security-Update-Origins {
    "\${distro_id} \${distro_codename}-security";
 };
 EOF
-        else
-            case $DBVAL in
-                "true") VAL=1;;
-                     *) VAL=0;;
-            esac
-            sed -i -e "s,^\(\s*Whatmaps::Enable-Restart\s\+\"\)\S\+\(\"\s*;\),\1${VAL}\2," $APT_CONF
+            fi
         fi
     ;;
         abort-upgrade|abort-remove|abort-deconfigure)
