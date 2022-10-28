@@ -3,7 +3,7 @@ Section: admin
 Priority: extra
 Maintainer: Guido Günther <agx@sigxcpu.org>
 Build-Depends:
-  debhelper (>= 9~),
+  debhelper-compat (= 13),
   dh-python,
   lsb-release,
   python3,
