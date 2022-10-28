@@ -1,3 +1,20 @@
+whatmaps (0.0.12-4) unstable; urgency=medium
+
+  * [3030430] d/postinst: Don't fail in container without apt
+    (Closes: #1020895)
+  * [dbd0843] Bump debhelper compat to 13
+  * [b2b1e7b] d/control: Drop X-Python3-Version
+  * [de2a09d] Bump standards version to 4.6.1.
+    No changes needed
+  * [b0f56a6] Drop unused pyversions.
+    Thanks linitian
+  * [75a2d0b] d/rules: Use dh_execute_after.
+    This ensures that DEB_BUILD_OPTIONS=nocheck gets honored automatically
+  * [6b68c87] d/control: Switch priority to optional.
+    It's prefereed over `extra`
+
+ -- Guido Günther <agx@sigxcpu.org>  Fri, 28 Oct 2022 09:59:38 +0200
+
 whatmaps (0.0.12-3) unstable; urgency=medium
 
   * [f2095d5] Fix vcs-git url
