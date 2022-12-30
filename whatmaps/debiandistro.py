@@ -20,11 +20,6 @@ try:
 except ImportError:
     apt_pkg = None
 
-try:
-    import lsb_release
-except ImportError:
-    lsb_release = None
-
 import logging
 import os
 import subprocess
@@ -143,10 +138,8 @@ class DebianDistro(Distro):
     def _security_update_origins(klass):
         "Determine security update origins from apt configuration"
 
-        if lsb_release is None:
-            raise PkgError("lsb_release not found, can't determine security updates")
-
-        codename = lsb_release.get_distro_information()['CODENAME']
+        with open("/etc/debian_version") as f:
+            codename = f.read().strip()
 
         def _subst(line):
             mapping = {'distro_codename': codename,
