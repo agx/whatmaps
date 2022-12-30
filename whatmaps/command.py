@@ -257,6 +257,6 @@ def main(argv):
 
 
 def run():
-    return(main(sys.argv))
+    return main(sys.argv)
 
 # vim:et:ts=4:sw=4:et:sts=4:ai:set list listchars=tab\:»·,trail\:·:
