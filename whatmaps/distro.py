@@ -130,7 +130,7 @@ def detect():
         try:
             lsb_cmd = subprocess.Popen(['lsb_release', '--id', '-s'],
                                        stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE)
+                                       stderr=subprocess.DEVNULL)
             output = lsb_cmd.communicate()[0]
             if not lsb_cmd.returncode:
                 id = output.strip()
