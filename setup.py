@@ -20,18 +20,12 @@ from setuptools import setup
 
 data_files = []
 
-try:
-    import lsb_release
-    if (lsb_release.get_distro_information()['ID'] in ['Debian'] or
-            os.path.exists('/etc/debian_version')):
-        data_files = [('../etc/apt/apt.conf.d/',
-                       ['apt/50whatmaps_apt']),
-                      ('../etc/apt/apt.conf.d/',
-                       ['apt/20services']),
-                      ]
-except ImportError:
-    pass
-
+if os.path.exists('/etc/debian_version'):
+    data_files = [('../etc/apt/apt.conf.d/',
+                   ['apt/50whatmaps_apt']),
+                  ('../etc/apt/apt.conf.d/',
+                   ['apt/20services']),
+                  ]
 
 setup(name="whatmaps",
       author='Guido Günther',
