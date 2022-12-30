@@ -1,0 +1,5 @@
+whatmaps 0.0.13
+---------------
+Released December 2022
+* Run without lsb python modules
+* Make flake8 happy
