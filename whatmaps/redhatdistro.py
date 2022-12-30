@@ -25,7 +25,7 @@ from . rpmpkg import RpmPkg
 class RedHatDistro(Distro):
     """RPM based distribution"""
     _pkg_re = re.compile(r'(?P<pkg>[\w\-\+]+)-(?P<ver>[\w\.]+)'
-                         '-(?P<rel>[\w\.]+)\.(?P<arch>.+)')
+                         r'-(?P<rel>[\w\.]+)\.(?P<arch>.+)')
 
     @classmethod
     def pkg(klass, name):

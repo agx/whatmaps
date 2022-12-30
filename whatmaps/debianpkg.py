@@ -22,7 +22,7 @@ from . pkg import Pkg
 
 class DebianPkg(Pkg):
     type = 'Debian'
-    _init_script_re = re.compile('/etc/init.d/[\w\-\.]')
+    _init_script_re = re.compile(r'/etc/init.d/[\w\-\.]')
     _list_contents = ['dpkg-query', '-L', '${pkg_name}']
 
     def __init__(self, name):

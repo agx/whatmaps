@@ -22,7 +22,7 @@ from . pkg import Pkg
 
 class RpmPkg(Pkg):
     type = 'RPM'
-    _init_script_re = re.compile('/etc/rc.d/init.d/[\w\-\.]')
+    _init_script_re = re.compile(r'/etc/rc.d/init.d/[\w\-\.]')
     _list_contents = ['rpm', '-ql', '$pkg_name']
 
     def __init__(self, name):
