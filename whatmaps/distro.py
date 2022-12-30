@@ -133,7 +133,7 @@ def detect():
                                        stderr=subprocess.DEVNULL)
             output = lsb_cmd.communicate()[0]
             if not lsb_cmd.returncode:
-                id = output.strip()
+                id = output.decode().split('\n')[0].strip()
         except OSError:
             # id is None in this case
             pass
