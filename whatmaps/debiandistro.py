@@ -119,10 +119,10 @@ class DebianDistro(Distro):
             aptconfig = sys.stdin.readline()
             if not aptconfig or aptconfig == '\n':
                 break
-            if aptconfig.startswith('Whatmaps::Enable-Restart=') and \
-               aptconfig.strip().split('=', 1)[1].lower() in ["true", "1"]:
-                    logging.debug("Service restarts enabled")
-                    whatmaps_enabled = True
+            if (aptconfig.startswith('Whatmaps::Enable-Restart=') and
+                    aptconfig.strip().split('=', 1)[1].lower() in ["true", "1"]):
+                logging.debug("Service restarts enabled")
+                whatmaps_enabled = True
 
         if not whatmaps_enabled:
             return None
