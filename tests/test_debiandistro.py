@@ -15,7 +15,7 @@
 """Test L{whatmaps.process} config"""
 
 import unittest
-from mock import patch
+from unittest.mock import patch
 
 try:
     import apt_pkg  # noqa: F401

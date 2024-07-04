@@ -16,7 +16,7 @@
 
 import unittest
 
-from mock import patch
+from unittest.mock import patch
 
 try:
     import lsb_release  # noqa: F401

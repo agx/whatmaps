@@ -15,7 +15,7 @@
 """Test L{whatmaps.process} config"""
 
 import unittest
-from mock import patch
+from unittest.mock import patch
 
 from whatmaps.redhatdistro import RedHatDistro
 from whatmaps.rpmpkg import RpmPkg
