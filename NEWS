@@ -1,3 +1,9 @@
+whatmaps 0.0.14
+---------------
+Released July 2024
+* Use unittest.mock
+* Avoid test functions dropped in python3.12
+
 whatmaps 0.0.13
 ---------------
 Released December 2022
