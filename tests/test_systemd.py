@@ -79,5 +79,5 @@ class TestSystemd(unittest.TestCase):
                 PopenMock = mock.return_value
                 PopenMock.communicate.return_value = [output]
                 PopenMock.returncode = 0
-                with self.assertRaisesRegexp(ValueError, "Can't parse service name from session-8762.scope - Session 8762 of user root"):
+                with self.assertRaisesRegex(ValueError, "Can't parse service name from session-8762.scope - Session 8762 of user root"):
                     Systemd().process_to_unit(p)
